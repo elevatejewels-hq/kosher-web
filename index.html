@@ -75,9 +75,78 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #BDC1C6;
     }
+    /* --- Home Logo Bubbles Animation (5 seconds, pure HTML/CSS/JS — no video file) --- */
+    #logo-bubbles {
+      opacity: 0;
+      background:
+        radial-gradient(420px 260px at 18% 30%, rgba(234, 64, 251, 0.20), transparent 70%),
+        radial-gradient(460px 300px at 82% 24%, rgba(68, 138, 255, 0.20), transparent 70%),
+        radial-gradient(380px 260px at 55% 88%, rgba(124, 77, 255, 0.18), transparent 70%),
+        radial-gradient(300px 200px at 30% 85%, rgba(64, 196, 255, 0.16), transparent 70%);
+    }
+    #logo-bubbles.kw-bubbles-playing {
+      animation: kwBubbleWash 5s ease-in-out forwards;
+    }
+    @keyframes kwBubbleWash {
+      0% { opacity: 0; }
+      12% { opacity: 1; }
+      82% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .kw-bubble {
+      position: absolute;
+      display: block;
+      border-radius: 9999px;
+      box-shadow: inset -6px -8px 14px rgba(255, 255, 255, 0.25), inset 4px 6px 10px rgba(255, 255, 255, 0.55), 0 6px 18px rgba(124, 77, 255, 0.18);
+    }
+    .kw-drift-a { animation: kwDriftA 5s ease-in-out forwards; }
+    .kw-drift-b { animation: kwDriftB 5s ease-in-out forwards; }
+    .kw-drift-c { animation: kwDriftC 5s ease-in-out forwards; }
+    @keyframes kwDriftA {
+      0% { transform: translate(0, 14px) scale(0.7); }
+      35% { transform: translate(-16px, -18px) scale(1.05); }
+      70% { transform: translate(10px, -30px) scale(0.95); }
+      100% { transform: translate(-6px, -8px) scale(0.8); }
+    }
+    @keyframes kwDriftB {
+      0% { transform: translate(0, 10px) scale(0.75); }
+      40% { transform: translate(18px, -12px) scale(1.08); }
+      75% { transform: translate(-8px, -26px) scale(0.92); }
+      100% { transform: translate(8px, -6px) scale(0.82); }
+    }
+    @keyframes kwDriftC {
+      0% { transform: translate(0, 18px) scale(0.65); }
+      45% { transform: translate(-10px, -22px) scale(1.1); }
+      100% { transform: translate(12px, -12px) scale(0.85); }
+    }
+    /* --- Opening Splash (K logo brightens in; clears after ~2s, CSS fallback so it can never trap) --- */
+    #kw-splash {
+      animation: kwSplashHide 0.45s ease 2.35s forwards;
+    }
+    #kw-splash-logo {
+      animation: kwSplashBrighten 1.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+    }
+    @keyframes kwSplashBrighten {
+      0% { opacity: 0.1; filter: brightness(2.1) saturate(0.25); transform: scale(0.94); }
+      55% { opacity: 0.75; filter: brightness(1.35) saturate(0.7); transform: scale(0.99); }
+      100% { opacity: 1; filter: brightness(1) saturate(1); transform: scale(1); }
+    }
+    @keyframes kwSplashHide {
+      to { opacity: 0; visibility: hidden; }
+    }
   </style>
 </head>
 <body class="bg-white text-inkPrimary font-sans antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-brandBlue">
+
+  <!-- Opening Splash — only the kosher web K logo, brightening in; clears after ~2 seconds (click to skip) -->
+  <div id="kw-splash" onclick="dismissSplash()" class="fixed inset-0 z-[100] bg-white flex items-center justify-center cursor-pointer" aria-hidden="true">
+    <svg id="kw-splash-logo" class="w-28 h-28 sm:w-36 sm:h-36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web logo">
+      <rect x="22" y="12" width="22" height="96" fill="#4285F4" />
+      <polygon points="44,57 62,38 74,51 44,82" fill="#34A853" />
+      <polygon points="62,38 87,12 110,12 74,51" fill="#EA4335" />
+      <polygon points="59,67 74,51 110,108 87,108" fill="#FBBC05" />
+    </svg>
+  </div>
 
   <!-- Persistent Top Utility & App Navigation Bar -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-hairline">
@@ -257,15 +326,18 @@
     <!-- VIEW 1: HOME SEARCH HUB (Iconic, Airy, Focused) -->
     <section id="view-home" class="app-view max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-16">
 
-      <!-- Centered Custom 4-Color "K" + "kosher web" Wordmark -->
-      <div class="flex flex-col items-center text-center mb-8 select-none">
-        <svg class="w-24 h-24 sm:w-28 sm:h-28 mb-2" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web logo">
-          <rect x="22" y="12" width="22" height="96" fill="#4285F4" />
-          <polygon points="44,57 62,38 74,51 44,82" fill="#34A853" />
-          <polygon points="62,38 87,12 110,12 74,51" fill="#EA4335" />
-          <polygon points="59,67 74,51 110,108 87,108" fill="#FBBC05" />
-        </svg>
-        <h1 class="text-4xl sm:text-[44px] font-normal tracking-tight text-inkSecondary leading-none">
+      <!-- Centered Custom 4-Color "K" + "kosher web" Wordmark — click the logo: 5-second bubbles animation (logo stays in place, bubbles move) -->
+      <div id="home-hero" class="relative flex flex-col items-center text-center mb-8 select-none">
+        <div id="logo-bubbles" class="hidden pointer-events-none absolute -inset-x-4 sm:-inset-x-14 -top-6 -bottom-8" aria-hidden="true"></div>
+        <button id="home-logo-btn" onclick="playLogoAnimation()" title="Play the kosher web bubbles animation" aria-label="Play the kosher web bubbles animation" class="tactile-btn relative z-10 rounded-[2rem] focus:outline-none cursor-pointer">
+          <svg class="w-24 h-24 sm:w-28 sm:h-28 mb-2 block" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web logo">
+            <rect x="22" y="12" width="22" height="96" fill="#4285F4" />
+            <polygon points="44,57 62,38 74,51 44,82" fill="#34A853" />
+            <polygon points="62,38 87,12 110,12 74,51" fill="#EA4335" />
+            <polygon points="59,67 74,51 110,108 87,108" fill="#FBBC05" />
+          </svg>
+        </button>
+        <h1 class="relative z-10 text-4xl sm:text-[44px] font-normal tracking-tight text-inkSecondary leading-none">
           kosher web
         </h1>
       </div>
@@ -378,44 +450,164 @@
         </button>
       </div>
 
-      <!-- Compact, Refined Sponsor Spotlight Carousel -->
+      <!-- Today's Specials — always 3 deal cards, auto-rotates every 2 seconds -->
       <div class="mt-12 max-w-3xl mx-auto">
-        <div class="rounded-3xl bg-surfaceSoft border border-hairline p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-          <div class="space-y-1.5 max-w-xl">
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full bg-white border border-hairline text-[11px] font-semibold text-inkSecondary">
-                Verified Sponsor
-              </span>
-              <span id="home-sponsor-badge" class="px-2.5 py-0.5 rounded-full bg-green-50 text-logoGreen text-[11px] font-semibold">
-                2% Cash Back + 150 Pts
-              </span>
-            </div>
-            <h2 id="home-sponsor-title" class="text-base sm:text-lg font-semibold text-inkPrimary">
-              Elevate Jewels — Fine Diamond &amp; Gold Collections
-            </h2>
-            <p id="home-sponsor-desc" class="text-xs sm:text-sm text-inkSecondary leading-relaxed">
-              Certified GIA diamonds, wedding bands, and heirloom pieces with direct workshop pricing and instant 2% cash back.
-            </p>
+        <div id="home-specials-box" class="rounded-3xl bg-surfaceSoft border border-hairline p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <h2 class="text-base sm:text-lg font-semibold text-inkPrimary">Today's Specials — Best Deals Across All Web Brands</h2>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-[11px] font-semibold shrink-0">
+              <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.2 12.4l2.5 2.5 5.1-5.4" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Todays Top Specials
+            </span>
           </div>
 
-          <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
-            <button onclick="openClaimModal(sponsors[currentSponsorIdx].store)" class="tactile-btn px-4 py-2 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs font-semibold">
-              Claim Offer
+          <div id="home-specials-cards" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <!-- Populated dynamically: always exactly 3 deal cards -->
+          </div>
+
+          <div class="flex items-center justify-between gap-3 mt-5">
+            <button onclick="openAllSpecials()" class="tactile-btn px-4 py-2 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs font-semibold">
+              See all specials
             </button>
             <div class="flex items-center gap-1">
-              <button onclick="prevSponsorSlide()" aria-label="Previous sponsor" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
+              <button onclick="prevSpecial()" aria-label="Previous specials" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-              <div id="home-sponsor-dots" class="flex items-center gap-1 px-1">
-                <button onclick="setSponsorSlide(0)" class="w-2 h-2 rounded-full bg-brandBlue" aria-label="Slide 1"></button>
-                <button onclick="setSponsorSlide(1)" class="w-2 h-2 rounded-full bg-gray-300" aria-label="Slide 2"></button>
-                <button onclick="setSponsorSlide(2)" class="w-2 h-2 rounded-full bg-gray-300" aria-label="Slide 3"></button>
-              </div>
-              <button onclick="nextSponsorSlide()" aria-label="Next sponsor" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
+              <div id="home-specials-dots" class="flex items-center gap-1 px-1"></div>
+              <button onclick="nextSpecial()" aria-label="Next specials" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- App Grid — the bottom of the home page is filled with app-sized kosher web apps -->
+      <div class="mt-14 max-w-3xl mx-auto">
+        <div class="flex items-center justify-between px-1 mb-4">
+          <h2 class="text-[11px] font-semibold uppercase tracking-wider text-inkSecondary">kosher web Apps</h2>
+          <span class="text-[11px] font-medium text-brandBlue">Tap an app to open it</span>
+        </div>
+        <div id="home-app-grid" class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+
+          <button data-app-tile="fast-search" onclick="openFastSearchApp()" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Fast Search">
+            <img src="data:image/jpeg;base64,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" alt="Fast Search" class="w-14 h-14 rounded-2xl object-cover" />
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Fast Search</span>
+          </button>
+
+          <button data-app-tile="chat" onclick="switchAppView('chat')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Kosher Chat">
+            <svg class="w-14 h-14" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
+              <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+              <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+              <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
+              <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Kosher Chat</span>
+          </button>
+
+          <button data-app-tile="calendar" onclick="switchAppView('calendar')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Calendar & Zmanim">
+            <svg class="w-12 h-12 text-logoBlue" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Calendar &amp; Zmanim</span>
+          </button>
+
+          <button data-app-tile="cards" onclick="switchAppView('cards')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Credit Cards">
+            <svg class="w-12 h-12 text-brandBlue" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Credit Cards</span>
+          </button>
+
+          <button data-app-tile="deals" onclick="switchAppView('deals')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Deals & Shopping">
+            <svg class="w-12 h-12 text-logoRed" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Deals &amp; Shopping</span>
+          </button>
+
+          <button data-app-tile="directory" onclick="switchAppView('directory')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Directory">
+            <svg class="w-12 h-12 text-logoGreen" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Directory</span>
+          </button>
+
+          <button data-app-tile="rewards" onclick="switchAppView('rewards')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Cash Back">
+            <svg class="w-12 h-12 text-logoGreen" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Cash Back</span>
+          </button>
+
+          <button data-app-tile="sponsor" onclick="switchAppView('sponsor')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Sponsor">
+            <svg class="w-12 h-12 text-logoYellow" fill="currentColor" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Sponsor</span>
+          </button>
+
+          <button data-app-tile="ai-fast-search" onclick="focusHomeSearch()" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="AI Fast Search — jump to the search bar">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="7" stroke="#4285F4" stroke-width="2" />
+              <line x1="15.8" y1="15.8" x2="21" y2="21" stroke="#EA4335" stroke-width="2.4" stroke-linecap="round" />
+              <text x="10.5" y="13.2" text-anchor="middle" font-family="Inter, sans-serif" font-size="6.5" font-weight="700" fill="#4285F4">AI</text>
+              <path d="M19.5 1.5 L20.1 3.2 L21.8 3.8 L20.1 4.4 L19.5 6.1 L18.9 4.4 L17.2 3.8 L18.9 3.2 Z" fill="#FBBC05" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">AI Fast Search</span>
+          </button>
+
+          <button data-app-tile="web-ai-assistant" onclick="switchAppView('chat')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Web AI Assistant — opens Kosher Chat">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="kwAssistantGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#7C4DFF" />
+                  <stop offset="0.55" stop-color="#E040FB" />
+                  <stop offset="1" stop-color="#FF7043" />
+                </linearGradient>
+              </defs>
+              <path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.5 5.1 3.8 6.6-.1 1.2-.6 2.6-1.5 3.7 2-.1 3.9-.9 5.2-1.9.8.2 1.6.3 2.5.3 5.5 0 10-3.9 10-8.7S17.5 3 12 3Z" fill="url(#kwAssistantGrad)" />
+              <circle cx="7.6" cy="11.7" r="1.5" fill="#FFFFFF" />
+              <circle cx="12" cy="11.7" r="1.5" fill="#FFFFFF" />
+              <circle cx="16.4" cy="11.7" r="1.5" fill="#FFFFFF" />
+              <path d="M19.8 1.2 L20.3 2.6 L21.7 3.1 L20.3 3.6 L19.8 5 L19.3 3.6 L17.9 3.1 L19.3 2.6 Z" fill="#FBBC05" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Web AI Assistant</span>
+          </button>
+
+          <button data-app-tile="upload-analyze" onclick="showToast('Upload &amp; Analyze — document analysis arrives when Kosher Chat connects.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Upload & Analyze (feature)">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 2.5h8L19 7.5v14H6z" stroke="#5F6368" stroke-width="1.8" fill="#F8F9FA" />
+              <path d="M14 2.5v5h5" stroke="#5F6368" stroke-width="1.8" fill="none" />
+              <line x1="12" y1="17.5" x2="12" y2="10.5" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" />
+              <polyline points="8.8,13.4 12,10.2 15.2,13.4" stroke="#1A73E8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <line x1="8" y1="20" x2="16" y2="20" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Upload &amp; Analyze</span>
+          </button>
+
+          <button data-app-tile="automated-tasker" onclick="showToast('Automated Tasker — workflow automations arrive when the assistant connects.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Automated Tasker (feature)">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="3" y="5" width="15" height="14" rx="2.5" stroke="#5F6368" stroke-width="1.8" fill="#FFFFFF" />
+              <path d="M3 8.5a2.5 2.5 0 0 1 2.5-2.5h10A2.5 2.5 0 0 1 18 8.5v1H3z" fill="#EA4335" />
+              <polyline points="6.8,14.6 9.3,17.1 13.6,12.6" stroke="#34A853" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="18.6" cy="18.2" r="2.6" stroke="#1A73E8" stroke-width="1.8" fill="#FFFFFF" />
+              <path d="M18.6 14.6v1.6M18.6 20.2v1.6M15 18.2h1.6M20.2 18.2h1.6M16.1 15.7l1.1 1.1M19.9 19.6l1.1 1.1M21 15.7l-1.1 1.1M17.2 19.6l-1.1 1.1" stroke="#1A73E8" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Automated Tasker</span>
+          </button>
+
+          <button data-app-tile="secure-checkout" onclick="showToast('Secure Checkout — planned with Stripe; not live yet.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Secure Checkout (feature)">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="1.5" y="5" width="17" height="12" rx="2.5" fill="#4285F4" />
+              <rect x="1.5" y="8" width="17" height="2.6" fill="#FFFFFF" opacity="0.85" />
+              <rect x="14.2" y="13.2" width="7.4" height="6.4" rx="1.6" fill="#FBBC05" />
+              <path d="M16 13.2v-1.4a1.9 1.9 0 0 1 3.8 0v1.4" stroke="#F9A825" stroke-width="1.7" fill="none" />
+              <circle cx="17.9" cy="16.4" r="1.1" fill="#FFFFFF" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Secure Checkout</span>
+          </button>
+
+          <button data-app-tile="image-moderation" onclick="showToast('Image Moderation — listings will be screened so product images never show people.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Image Moderation (feature)">
+            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="2" y="3.5" width="17" height="13" rx="2.5" stroke="#5F6368" stroke-width="1.8" fill="#FFFFFF" />
+              <circle cx="7.6" cy="8" r="1.5" fill="#FBBC05" />
+              <path d="M3.5 15.5l4.2-4.2 3 3 3.4-3.4 3.4 3.4" stroke="#4285F4" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M17.4 13.6l4.1 1.7v3.1c0 2.5-1.7 4-4.1 4.9-2.4-.9-4.1-2.4-4.1-4.9v-3.1z" fill="#34A853" />
+              <polyline points="15.4,18.6 16.7,19.9 19.4,17" stroke="#FFFFFF" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Image Moderation</span>
+          </button>
+
         </div>
       </div>
     </section>
@@ -628,6 +820,20 @@
       <div id="directory-app-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Populated dynamically -->
       </div>
+
+      <!-- All Stores — the full store directory (tap a store: its website opens; no website → store details) -->
+      <div class="mt-12">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-hairline">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-logoGreen">Cash Back Stores</span>
+            <h3 class="text-xl sm:text-2xl font-semibold text-inkPrimary mt-1">All Stores</h3>
+          </div>
+          <span id="store-count-label" class="text-xs font-medium text-inkSecondary">30 stores · 2% Cash Back</span>
+        </div>
+        <div id="directory-stores-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
     </section>
 
     <!-- VIEW 6: CASH BACK & GAMIFICATION REWARDS HUB -->
@@ -782,6 +988,113 @@
       </div>
     </section>
 
+    <!-- VIEW 8: KOSHER CHAT — BUSINESS AI ASSISTANT (layout per owner's chat mock) -->
+    <section id="view-chat" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 overflow-hidden flex h-[72vh] min-h-[540px]">
+
+        <!-- Dark Sidebar: Chat + Chat History -->
+        <aside class="hidden md:flex w-64 shrink-0 bg-[#202124] text-white flex-col">
+          <div class="flex items-center justify-between px-5 pt-5 pb-3">
+            <span class="text-lg font-medium">Chat</span>
+            <span class="text-white/40" aria-hidden="true">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+            </span>
+          </div>
+          <div class="px-3">
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-full bg-white/10 text-sm text-white/90">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <span>Chat history</span>
+            </div>
+          </div>
+          <div id="chat-history-list" class="px-3 mt-3 space-y-1 overflow-y-auto">
+            <p id="chat-history-empty" class="px-3 text-xs leading-relaxed text-white/40">No chats yet — your conversations will appear here.</p>
+          </div>
+          <div class="mt-auto p-3">
+            <button onclick="startNewChat()" class="tactile-btn w-full py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-sm font-medium text-white">+ New chat</button>
+          </div>
+        </aside>
+
+        <!-- Main Chat Column -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <!-- Chat Header: small mark + "kosher chat" -->
+          <div class="flex items-center justify-between px-5 sm:px-6 pt-5 pb-2">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
+                <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
+                <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
+              </svg>
+              <span class="text-xl font-normal text-inkSecondary">kosher chat</span>
+            </div>
+            <button onclick="startNewChat()" title="Start a new chat" class="tactile-btn md:hidden px-3.5 py-1.5 rounded-full bg-surfaceSoft border border-hairline text-xs font-medium text-inkSecondary">New chat</button>
+          </div>
+
+          <!-- Messages Area -->
+          <div id="chat-messages" class="flex-1 overflow-y-auto px-5 sm:px-8 py-4">
+            <!-- Centred greeting — shown until the first message is sent -->
+            <div id="chat-hero" class="h-full flex flex-col items-center justify-center text-center py-8">
+              <svg class="w-20 h-20 mb-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
+                <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
+                <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
+              </svg>
+              <h2 class="text-2xl sm:text-[28px] font-normal text-inkPrimary leading-snug">Hi, how can I help your business today?</h2>
+              <p class="text-sm text-inkSecondary mt-3 max-w-md leading-relaxed">Kosher Chat is the kosher web assistant for business questions. It is being connected now — you can already start the conversation below.</p>
+            </div>
+            <div id="chat-thread" class="space-y-4"></div>
+          </div>
+
+          <!-- Adjust Search Parameters Toggle -->
+          <div class="px-5 sm:px-8">
+            <div class="flex items-center justify-end gap-2.5">
+              <span class="text-xs text-inkSecondary">Adjust search parameters</span>
+              <button id="chat-params-toggle" onclick="toggleChatParams()" role="switch" aria-checked="false" aria-label="Adjust search parameters" class="tactile-btn relative w-11 h-6 rounded-full bg-gray-300 shrink-0">
+                <span id="chat-params-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+              </button>
+            </div>
+            <div id="chat-params-panel" class="hidden mt-2.5 flex flex-wrap items-center justify-end gap-1.5">
+              <span class="text-[11px] text-inkSecondary mr-1">The assistant will search:</span>
+              <button onclick="setChatParamScope('all')" data-chat-scope="all" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-blue-50 text-brandBlue border border-blue-200/80">All of kosher web</button>
+              <button onclick="setChatParamScope('deals')" data-chat-scope="deals" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Deals</button>
+              <button onclick="setChatParamScope('directory')" data-chat-scope="directory" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Directory</button>
+              <button onclick="setChatParamScope('calendar')" data-chat-scope="calendar" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Zmanim</button>
+            </div>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="px-4 sm:px-6 pb-5 pt-2.5">
+            <div class="flex items-center gap-1 bg-white rounded-full border border-hairline shadow-pill focus-within:shadow-pill-hover px-2 py-1.5">
+              <button onclick="showToast('Attachments arrive when Kosher Chat connects.')" aria-label="Attach a file" title="Attach" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button onclick="showToast('Photo search arrives when Kosher Chat connects.')" aria-label="Search by photo" title="Photo search" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <input
+                id="chat-input"
+                type="text"
+                autocomplete="off"
+                placeholder="Ask kosher chat..."
+                onkeydown="if(event.key==='Enter') sendChatMessage()"
+                class="flex-1 min-w-0 bg-transparent px-2 text-sm sm:text-[15px] text-inkPrimary placeholder-inkSecondary/70 focus:outline-none"
+              />
+              <button onclick="showToast('Voice input arrives when Kosher Chat connects.')" aria-label="Voice input" title="Voice input" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+              <button onclick="sendChatMessage()" aria-label="Send message" title="Send" class="tactile-btn w-10 h-10 rounded-full bg-brandBlue hover:bg-blue-700 text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <p class="text-[11px] text-inkSecondary text-center mt-2.5">Kosher Chat is for business questions. The assistant is being connected — answers will appear here soon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Minimalist Clean Footer -->
@@ -799,6 +1112,7 @@
         <button onclick="switchAppView('home')" class="hover:text-inkPrimary">Search Hub</button>
         <button onclick="switchAppView('calendar')" class="hover:text-inkPrimary">Calendar &amp; Zmanim</button>
         <button onclick="switchAppView('cards')" class="hover:text-inkPrimary">Credit Cards</button>
+        <button onclick="switchAppView('chat')" class="hover:text-inkPrimary">Kosher Chat</button>
         <button onclick="switchAppView('sponsor')" class="hover:text-brandBlue font-medium">Advertise</button>
       </div>
     </div>
@@ -849,6 +1163,25 @@
     </div>
   </div>
 
+  <!-- Store Details Modal (stores without a website open their details here) -->
+  <div id="store-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-launcher border border-hairline">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline">
+        <h3 id="store-modal-name" class="text-lg font-semibold text-inkPrimary">Store Details</h3>
+        <button onclick="closeModal('store-modal')" class="p-1.5 rounded-full hover:bg-surfaceSoft text-inkSecondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="py-4 space-y-2.5 text-sm text-inkPrimary">
+        <p><span class="text-inkSecondary">Category:</span> <span id="store-modal-category">—</span></p>
+        <p><span class="text-inkSecondary">Address:</span> <span id="store-modal-address">—</span></p>
+        <p><span class="text-inkSecondary">Phone:</span> <span id="store-modal-phone">—</span></p>
+        <p class="pt-1 text-xs font-semibold text-logoGreen">2% Cash Back at this store</p>
+        <p class="text-[11px] text-inkSecondary">This store has no website on file — call or visit in person.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- One-Click Account Sign In Modal -->
   <div id="account-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-launcher border border-hairline">
@@ -879,7 +1212,10 @@
     // --- Application State ---
     let currentView = 'home';
     let homeSearchScope = 'all';
-    let currentSponsorIdx = 0;
+    let specialsStartIdx = 0;
+    let specialsTimer = null;
+    let specialsPauseUntil = 0;
+    let specialsHovering = false;
     let userPoints = 1250;
     let userCashback = 84.50;
     let selectedCardFilter = 'all';
@@ -1200,7 +1536,7 @@
       "Jerusalem, Israel · 68°F Clear"
     ];
 
-    const APP_VIEWS = ['home', 'calendar', 'cards', 'deals', 'directory', 'rewards', 'sponsor'];
+    const APP_VIEWS = ['home', 'calendar', 'cards', 'deals', 'directory', 'rewards', 'sponsor', 'chat'];
 
     // --- Small Helpers ---
     function fmtNum(n) {
@@ -1337,6 +1673,7 @@
 
     // --- Home Search ---
     const SEARCH_DESTINATIONS = [
+      { type: 'chat', label: 'Kosher Chat', sub: 'Business assistant — ask about your business', view: 'chat', keywords: 'kosher chat ai assistant chat business help ask' },
       { type: 'calendar', label: 'Jewish Calendar & Zmanim', sub: 'Hebrew dates, Shabbat times & holidays', view: 'calendar', keywords: 'calendar zmanim shabbat hebrew date kislev parsha candle lighting times' },
       { type: 'cards', label: 'Credit Card Offers', sub: 'Compare cash back, travel & business cards', view: 'cards', keywords: 'credit card offers rewards apr bonus compare' },
       { type: 'deals', label: 'Best-Price Deals', sub: 'Verified lowest prices at partner stores', view: 'deals', keywords: 'deals shopping price store discount lowest' },
@@ -1419,7 +1756,7 @@
       const q = (query || '').trim();
       if (!q && homeSearchScope === 'all') {
         currentAcResults = SEARCH_DESTINATIONS.slice();
-        if (count) count.textContent = '6 quick destinations';
+        if (count) count.textContent = SEARCH_DESTINATIONS.length + ' quick destinations';
       } else {
         currentAcResults = searchMatches(q).slice(0, 8);
         if (count) count.textContent = currentAcResults.length + (currentAcResults.length === 1 ? ' match' : ' matches');
@@ -1502,35 +1839,86 @@
       openClaimModal(best.store);
     }
 
-    // --- Sponsor Spotlight Carousel (Home) ---
-    function renderSponsor() {
-      const sponsor = sponsors[currentSponsorIdx];
-      if (!sponsor) return;
-      const title = document.getElementById('home-sponsor-title');
-      const desc = document.getElementById('home-sponsor-desc');
-      const badge = document.getElementById('home-sponsor-badge');
-      if (title) title.textContent = sponsor.title;
-      if (desc) desc.textContent = sponsor.desc;
-      if (badge) badge.textContent = sponsor.badge;
-      const dots = document.getElementById('home-sponsor-dots');
+    // --- Today's Specials (Home) — always exactly 3 deal cards, auto-rotates every 2 seconds ---
+    const SPECIALS_AUTO_MS = 2000;
+    const SPECIALS_RESUME_MS = 8000;
+    const DEAL_VISUALS = {
+      electronics: { bg: 'bg-blue-50', fg: 'text-logoBlue', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0116 0v2"/><rect x="2.5" y="14" width="4.5" height="6.5" rx="2"/><rect x="17" y="14" width="4.5" height="6.5" rx="2"/></svg>' },
+      home: { bg: 'bg-amber-50', fg: 'text-logoYellow', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0012 3z"/></svg>' },
+      judaica: { bg: 'bg-indigo-50', fg: 'text-indigo-500', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 3.5l2.3 4.2 2.3-4.2M9.7 16.3L12 20.5l2.3-4.2M5.6 8.2h12.8M5.6 15.8h12.8M7.4 8.2L5.6 15.8M16.6 8.2l1.8 7.6M9.7 8.2h4.6M9.7 15.8h4.6"/></svg>' },
+      grocery: { bg: 'bg-green-50', fg: 'text-logoGreen', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M5 8h14l-1.3 11a2 2 0 01-2 1.8H8.3a2 2 0 01-2-1.8L5 8z"/><path d="M8.5 10V6.5a3.5 3.5 0 017 0V10"/></svg>' },
+      travel: { bg: 'bg-cyan-50', fg: 'text-cyan-600', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2.5"/><path d="M9 8V6.5A2.5 2.5 0 0111.5 4h1A2.5 2.5 0 0115 6.5V8M4 13h16"/></svg>' }
+    };
+
+    function specialCardHTML(deal) {
+      const visual = DEAL_VISUALS[deal.category] || DEAL_VISUALS.home;
+      return `
+        <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 p-4 flex flex-col" data-special-deal="${deal.id}">
+          <div class="h-24 rounded-2xl ${visual.bg} ${visual.fg} flex items-center justify-center mb-3">${visual.icon}</div>
+          <h3 class="text-sm font-semibold text-inkPrimary leading-snug mb-1">${deal.title}</h3>
+          <p class="text-xs font-medium text-brandBlue mb-1.5">${deal.store}</p>
+          <p class="text-xs text-inkSecondary mb-1">Now <span class="text-sm font-bold text-inkPrimary">${deal.price}</span> (was ${deal.was})</p>
+          <p class="text-[11px] font-semibold text-logoGreen mb-3">${deal.cashback}</p>
+          <div class="mt-auto flex justify-end">
+            <button onclick="openClaimModal('${deal.store}')" class="tactile-btn px-4 py-1.5 rounded-full bg-surfaceSoft border border-hairline hover:bg-gray-100 text-inkPrimary text-xs font-semibold">Claim</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSpecials() {
+      const wrap = document.getElementById('home-specials-cards');
+      if (!wrap || !dealsData.length) return;
+      const cards = [];
+      for (let i = 0; i < 3; i++) {
+        cards.push(specialCardHTML(dealsData[(specialsStartIdx + i) % dealsData.length]));
+      }
+      wrap.innerHTML = cards.join('');
+      const dots = document.getElementById('home-specials-dots');
       if (dots) {
-        dots.innerHTML = sponsors.map((s, idx) => `
-          <button onclick="setSponsorSlide(${idx})" class="w-2 h-2 rounded-full ${idx === currentSponsorIdx ? 'bg-brandBlue' : 'bg-gray-300'}" aria-label="Slide ${idx + 1}"></button>
+        dots.innerHTML = dealsData.map((deal, idx) => `
+          <button onclick="setSpecialStart(${idx})" class="w-2 h-2 rounded-full ${idx === specialsStartIdx ? 'bg-brandBlue' : 'bg-gray-300'}" aria-label="Show specials from deal ${idx + 1}"></button>
         `).join('');
       }
     }
 
-    function setSponsorSlide(idx) {
-      currentSponsorIdx = ((idx % sponsors.length) + sponsors.length) % sponsors.length;
-      renderSponsor();
+    function setSpecialStart(idx) {
+      specialsStartIdx = ((idx % dealsData.length) + dealsData.length) % dealsData.length;
+      renderSpecials();
     }
 
-    function nextSponsorSlide() {
-      setSponsorSlide(currentSponsorIdx + 1);
+    function pauseSpecials(ms) {
+      specialsPauseUntil = Date.now() + (ms || SPECIALS_RESUME_MS);
     }
 
-    function prevSponsorSlide() {
-      setSponsorSlide(currentSponsorIdx - 1);
+    function nextSpecial() {
+      pauseSpecials();
+      setSpecialStart(specialsStartIdx + 1);
+    }
+
+    function prevSpecial() {
+      pauseSpecials();
+      setSpecialStart(specialsStartIdx - 1);
+    }
+
+    function specialsAutoTick() {
+      if (specialsTimer === null) return;
+      if (currentView !== 'home') return;
+      if (specialsHovering) return;
+      if (Date.now() < specialsPauseUntil) return;
+      if (typeof document !== 'undefined' && document.hidden) return;
+      setSpecialStart(specialsStartIdx + 1);
+    }
+
+    function startSpecialsAuto() {
+      if (specialsTimer !== null) return;
+      specialsTimer = setInterval(specialsAutoTick, SPECIALS_AUTO_MS);
+    }
+
+    // "See all specials" — the doorway from the box to the full Deals view (with its category filters)
+    function openAllSpecials() {
+      filterDealsCategory('all');
+      switchAppView('deals');
     }
 
     // --- Claim / Offer Activation ---
@@ -1987,6 +2375,267 @@
       showToast('Sponsor request received — our team will reach out with placement details.');
     }
 
+    // --- Opening Splash ---
+    let splashDismissed = false;
+    function dismissSplash() {
+      if (splashDismissed) return;
+      splashDismissed = true;
+      const splash = document.getElementById('kw-splash');
+      if (!splash) return;
+      splash.style.transition = 'opacity 0.35s ease';
+      splash.style.opacity = '0';
+      splash.style.pointerEvents = 'none';
+      setTimeout(() => { splash.classList.add('hidden'); }, 380);
+    }
+
+    // --- Home App Grid Helpers ---
+    function openFastSearchApp() {
+      window.open('https://elevatejewels-hq.github.io/fast-search/', '_blank');
+    }
+
+    function focusHomeSearch() {
+      switchAppView('home');
+      const input = document.getElementById('home-search-input');
+      if (input) { try { input.focus(); } catch (e) { /* focus is cosmetic */ } }
+    }
+
+    // --- Home Logo Bubbles Animation (5 seconds, HTML/CSS/JS — never a video file; the logo itself never moves) ---
+    let logoAnimTimeout = null;
+    const BUBBLE_GRADIENTS = {
+      pink: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(240,98,255,0.75) 62%, rgba(194,24,255,0.85))',
+      purple: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(149,117,255,0.75) 62%, rgba(101,31,255,0.85))',
+      blue: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(68,138,255,0.75) 62%, rgba(41,98,255,0.85))',
+      cyan: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(100,255,218,0.70) 62%, rgba(0,191,165,0.80))',
+      amber: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(255,213,79,0.75) 62%, rgba(255,143,0,0.85))'
+    };
+    const LOGO_BUBBLES = [
+      { left: '0%', top: '8%', size: 76, c: 'pink', a: 'kw-drift-a', d: '0s' },
+      { left: '7%', top: '60%', size: 44, c: 'purple', a: 'kw-drift-b', d: '0.25s' },
+      { left: '15%', top: '-4%', size: 30, c: 'cyan', a: 'kw-drift-c', d: '0.1s' },
+      { left: '22%', top: '72%', size: 56, c: 'blue', a: 'kw-drift-b', d: '0.4s' },
+      { left: '34%', top: '0%', size: 26, c: 'amber', a: 'kw-drift-a', d: '0.55s' },
+      { left: '44%', top: '78%', size: 38, c: 'pink', a: 'kw-drift-c', d: '0.2s' },
+      { left: '55%', top: '-6%', size: 48, c: 'purple', a: 'kw-drift-a', d: '0.35s' },
+      { left: '63%', top: '66%', size: 30, c: 'cyan', a: 'kw-drift-b', d: '0.5s' },
+      { left: '71%', top: '2%', size: 58, c: 'blue', a: 'kw-drift-c', d: '0.15s' },
+      { left: '81%', top: '58%', size: 42, c: 'amber', a: 'kw-drift-a', d: '0.45s' },
+      { left: '89%', top: '10%', size: 66, c: 'pink', a: 'kw-drift-b', d: '0.3s' },
+      { left: '94%', top: '70%', size: 28, c: 'purple', a: 'kw-drift-c', d: '0.6s' },
+      { left: '48%', top: '36%', size: 20, c: 'cyan', a: 'kw-drift-a', d: '0.7s' },
+      { left: '5%', top: '34%', size: 22, c: 'blue', a: 'kw-drift-c', d: '0.65s' }
+    ];
+
+    function buildLogoBubbles(layer) {
+      layer.innerHTML = '';
+      LOGO_BUBBLES.forEach(cfg => {
+        const bubble = document.createElement('span');
+        bubble.className = 'kw-bubble ' + cfg.a;
+        bubble.style.left = cfg.left;
+        bubble.style.top = cfg.top;
+        bubble.style.width = cfg.size + 'px';
+        bubble.style.height = cfg.size + 'px';
+        bubble.style.animationDelay = cfg.d;
+        bubble.style.background = BUBBLE_GRADIENTS[cfg.c];
+        layer.appendChild(bubble);
+      });
+    }
+
+    function playLogoAnimation() {
+      const layer = document.getElementById('logo-bubbles');
+      if (!layer) return;
+      buildLogoBubbles(layer);
+      layer.classList.remove('hidden');
+      layer.classList.remove('kw-bubbles-playing');
+      void layer.offsetWidth; // restart the CSS animations when replayed
+      layer.classList.add('kw-bubbles-playing');
+      if (logoAnimTimeout) clearTimeout(logoAnimTimeout);
+      logoAnimTimeout = setTimeout(stopLogoAnimation, 5000);
+    }
+
+    function stopLogoAnimation() {
+      const layer = document.getElementById('logo-bubbles');
+      if (layer) {
+        layer.classList.remove('kw-bubbles-playing');
+        layer.classList.add('hidden');
+      }
+      if (logoAnimTimeout) { clearTimeout(logoAnimTimeout); logoAnimTimeout = null; }
+    }
+
+    // --- All Stores Directory (the full NexaMatch store list; tap: website opens in a new tab, no website → details) ---
+    const storesData = [
+      { name: "Pharmacy Plus", category: "Pharmacy", address: "728 N Main St, New Square, NY", phone: "(845) 354-9320", website: "http://www.pharmacyplus.com/" },
+      { name: "Lincoln Outerwear", category: "Clothing", address: "33 Lincoln Ave, New Square, NY", phone: "(845) 354-6096", website: null },
+      { name: "Jewel It - Custom Jewelry", category: "Jewelry", address: "10 Bush Ln, New Square, NY", phone: "(845) 364-0029", website: null },
+      { name: "Taam Eden Bakery", category: "Bakery / Food", address: "31 B Jefferson Ave, New Square, NY", phone: "(845) 354-8083", website: "https://www.facebook.com/115444131818600" },
+      { name: "F and F Variety Center", category: "Hardware / Variety", address: "39 Jefferson Ave, Spring Valley, NY", phone: "(845) 354-2374", website: "https://www.magictimes.com" },
+      { name: "Rockland Kosher Supermarket", category: "Groceries", address: "27 Orchard St, Monsey, NY", phone: "(845) 425-2266", website: "http://www.rocklandkosher.com/" },
+      { name: "Newday Market", category: "Groceries", address: "320 Saddle River Rd, Monsey, NY", phone: "(845) 414-3000", website: "http://www.newdaymonsey.com/" },
+      { name: "Mottys Supermarket", category: "Groceries", address: "18 College Rd, Monsey, NY", phone: "(845) 356-5310", website: "http://www.mottyskosher.com/" },
+      { name: "De Best Market", category: "Groceries", address: "176 Maple Ave, Monsey, NY", phone: "(845) 352-2021", website: null },
+      { name: "Kohn's Fresh Fish", category: "Food / Fish Market", address: "25 Main St, Monsey, NY", phone: "(845) 425-7776", website: null },
+      { name: "Supreme Health Food Center", category: "Health Food", address: "27 Orchard St, Monsey, NY", phone: "(845) 425-6004", website: "https://www.supremehealth.com/" },
+      { name: "Medwiz Pharmacy", category: "Pharmacy", address: "240 N Main St, Spring Valley, NY", phone: "(845) 624-5200", website: "http://medwizrx.com/" },
+      { name: "Eckerson Drugs", category: "Pharmacy", address: "287 N Main St, Spring Valley, NY", phone: "(845) 352-1800", website: "https://stores.healthmart.com/eckersondrugs" },
+      { name: "Hillcrest Pharmacy", category: "Pharmacy", address: "1 Hillcrest Center Dr, Spring Valley, NY", phone: "(845) 356-7300", website: null },
+      { name: "Pineapple Supermarket", category: "Groceries", address: "20 Mezritch Rd, Spring Valley, NY", phone: "(845) 354-5400", website: "http://www.pineapplekosher.com/" },
+      { name: "M&S Kollel Grocery", category: "Groceries", address: "44 Jefferson Ave, New Square, NY", phone: "(888) 959-2269", website: null },
+      { name: "Skvere Matzah Bakery", category: "Bakery", address: "11 Eisenhower Ave, Spring Valley, NY", phone: "(845) 362-8881", website: null },
+      { name: "Oneg Poultry Inc", category: "Butcher", address: "45 Jefferson Ave, Spring Valley, NY", phone: "(845) 354-6664", website: null },
+      { name: "Greens Delights", category: "Bakery", address: "82 Reagan Rd, Spring Valley, NY", phone: "(845) 354-2612", website: null },
+      { name: "Sparks Electronics and Housewares", category: "Electronics", address: "20 Mezritch Rd Ste 3, New Square, NY", phone: "(845) 585-7727", website: null },
+      { name: "Mable Home Furnishings", category: "Furniture", address: "40 Jefferson Ave, New Square, NY", phone: "(845) 354-2020", website: null },
+      { name: "AllmarkGifts", category: "Gift Shop", address: "29 Harrison La, New Square, NY", phone: "(646) 844-4387", website: "https://allmarkgifts.com/" },
+      { name: "Beadables Corp.", category: "Gifts & Jewelry", address: "3 Jackson Ave, New Square, NY", phone: "(845) 362-3492", website: null },
+      { name: "Menorah Judaica & Gifts", category: "Judaica & Gifts", address: "17 Koritz Way, Spring Valley, NY", phone: "(845) 354-0262", website: null },
+      { name: "B Cleaners", category: "Dry Cleaning", address: "25 Allik Way, New Square, NY", phone: "(845) 364-8255", website: null },
+      { name: "MM Tires", category: "Tires & Auto Repair", address: "674 N Main St, Spring Valley, NY", phone: "(845) 625-2050", website: null },
+      { name: "Little Caesars", category: "Pizza", address: "288 North Main St, Spring Valley, NY 10977", phone: "(845) 356-0354", website: "https://littlecaesars.com/en-us/store/10378/" },
+      { name: "Elevate Jewels", category: "Jewelry", address: "34 Main Street, Suite 213, Monsey, NY 10952", phone: null, website: "https://elevatejewelsny.com", featured: true },
+      { name: "Infinite Lighting", category: "Lighting & Home", address: "Online store", phone: null, website: "https://elevatejewels-hq.github.io/infinite-lighting/", featured: true },
+      { name: "WebFlowAI", category: "Websites & AI Services", address: "Online only", phone: null, website: "https://webflowai.app", featured: true }
+    ];
+
+    function renderStores() {
+      const grid = document.getElementById('directory-stores-grid');
+      if (!grid) return;
+      grid.innerHTML = storesData.map((store, idx) => `
+        <button onclick="openStore(${idx})" class="tactile-btn text-left bg-white rounded-3xl border border-hairline shadow-elevation-1 p-5 flex flex-col gap-1 hover:shadow-elevation-2" data-store-card="${idx}">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-green-50 text-logoGreen text-[11px] font-semibold">2% Cash Back</span>
+            ${store.featured
+              ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-[11px] font-semibold">Featured</span>'
+              : `<span class="text-[11px] font-medium text-brandBlue">${store.website ? 'Visit website →' : 'Details →'}</span>`}
+          </div>
+          <h3 class="text-sm font-semibold text-inkPrimary">${store.name}</h3>
+          <p class="text-xs text-inkSecondary">${store.category}</p>
+          <p class="text-[11px] text-inkSecondary">${store.address}</p>
+        </button>
+      `).join('');
+      const label = document.getElementById('store-count-label');
+      if (label) label.textContent = storesData.length + ' stores · 2% Cash Back';
+    }
+
+    function openStore(idx) {
+      const store = storesData[idx];
+      if (!store) return;
+      if (store.website) {
+        window.open(store.website, '_blank');
+        return;
+      }
+      const nameEl = document.getElementById('store-modal-name');
+      const catEl = document.getElementById('store-modal-category');
+      const addrEl = document.getElementById('store-modal-address');
+      const phoneEl = document.getElementById('store-modal-phone');
+      if (nameEl) nameEl.textContent = store.name;
+      if (catEl) catEl.textContent = store.category;
+      if (addrEl) addrEl.textContent = store.address;
+      if (phoneEl) phoneEl.textContent = store.phone || '—';
+      openModal('store-modal');
+    }
+
+    // --- Kosher Chat (business assistant — the AI back end connects in a later step; replies stay honest until then) ---
+    let chatStarted = false;
+    let chatReplyCount = 0;
+    let chatParamsOn = false;
+    let chatParamScope = 'all';
+    const CHAT_MARK_SVG = '<svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5"/><path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05"/><path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335"/></svg>';
+    const CHAT_NOT_CONNECTED_FIRST = 'Thanks for your message. Kosher Chat is still being connected, so it cannot answer business questions just yet. Soon this chat will help with kosher business search, deals, zmanim and verified contacts — your message stays right here in this chat.';
+    const CHAT_NOT_CONNECTED_AGAIN = 'Kosher Chat is still being connected — as soon as the assistant is live, it will answer your business questions right here.';
+
+    function appendChatBubble(text, who) {
+      const thread = document.getElementById('chat-thread');
+      if (!thread) return;
+      const row = document.createElement('div');
+      if (who === 'user') {
+        row.className = 'flex justify-end';
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble-user max-w-[80%] bg-surfaceSoft border border-hairline text-inkPrimary text-sm leading-relaxed px-4 py-2.5 rounded-3xl rounded-br-lg';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+      } else {
+        row.className = 'flex items-start gap-2.5';
+        const avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 shrink-0';
+        avatar.innerHTML = CHAT_MARK_SVG;
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble-assistant max-w-[80%] bg-white border border-hairline text-inkPrimary text-sm leading-relaxed px-4 py-2.5 rounded-3xl rounded-tl-lg shadow-xs';
+        bubble.textContent = text;
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+      thread.appendChild(row);
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    }
+
+    function addChatHistoryEntry(text) {
+      const list = document.getElementById('chat-history-list');
+      if (!list) return;
+      const empty = document.getElementById('chat-history-empty');
+      if (empty) empty.remove();
+      const item = document.createElement('div');
+      item.className = 'chat-history-entry px-3 py-2 rounded-xl bg-white/5 text-[13px] text-white/80 truncate';
+      item.textContent = text.length > 30 ? text.slice(0, 30) + '…' : text;
+      list.prepend(item);
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      const hero = document.getElementById('chat-hero');
+      if (hero) hero.classList.add('hidden');
+      if (!chatStarted) {
+        chatStarted = true;
+        addChatHistoryEntry(text);
+      }
+      appendChatBubble(text, 'user');
+      setTimeout(() => {
+        appendChatBubble(chatReplyCount === 0 ? CHAT_NOT_CONNECTED_FIRST : CHAT_NOT_CONNECTED_AGAIN, 'assistant');
+        chatReplyCount++;
+      }, 500);
+    }
+
+    function startNewChat() {
+      const thread = document.getElementById('chat-thread');
+      if (thread) thread.innerHTML = '';
+      const hero = document.getElementById('chat-hero');
+      if (hero) hero.classList.remove('hidden');
+      chatStarted = false;
+      chatReplyCount = 0;
+      const input = document.getElementById('chat-input');
+      if (input) { input.value = ''; try { input.focus(); } catch (e) { /* focus is cosmetic */ } }
+    }
+
+    function toggleChatParams() {
+      chatParamsOn = !chatParamsOn;
+      const toggle = document.getElementById('chat-params-toggle');
+      const knob = document.getElementById('chat-params-knob');
+      const panel = document.getElementById('chat-params-panel');
+      if (toggle) {
+        toggle.setAttribute('aria-checked', chatParamsOn ? 'true' : 'false');
+        toggle.classList.toggle('bg-brandBlue', chatParamsOn);
+        toggle.classList.toggle('bg-gray-300', !chatParamsOn);
+      }
+      if (knob) knob.style.transform = chatParamsOn ? 'translateX(20px)' : 'translateX(0px)';
+      if (panel) panel.classList.toggle('hidden', !chatParamsOn);
+    }
+
+    function setChatParamScope(scope) {
+      chatParamScope = scope;
+      document.querySelectorAll('.chat-scope-chip').forEach(chip => {
+        const isActive = chip.getAttribute('data-chat-scope') === scope;
+        chip.classList.remove('bg-blue-50', 'text-brandBlue', 'border-blue-200/80', 'bg-surfaceSoft', 'text-inkSecondary', 'border-hairline');
+        if (isActive) {
+          chip.classList.add('bg-blue-50', 'text-brandBlue', 'border-blue-200/80');
+        } else {
+          chip.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'border-hairline');
+        }
+      });
+    }
+
     // --- Initialization ---
     window.addEventListener('DOMContentLoaded', () => {
       renderCalendar();
@@ -1994,11 +2643,20 @@
       renderCardsApp();
       renderDealsApp();
       renderDirectoryApp();
+      renderStores();
       renderAutocomplete('');
-      renderSponsor();
+      renderSpecials();
+      startSpecialsAuto();
+      const specialsBox = document.getElementById('home-specials-box');
+      if (specialsBox) {
+        specialsBox.addEventListener('mouseenter', () => { specialsHovering = true; });
+        specialsBox.addEventListener('mouseleave', () => { specialsHovering = false; pauseSpecials(3000); });
+        specialsBox.addEventListener('touchstart', () => { pauseSpecials(); }, { passive: true });
+      }
       updateSpendCalculator(3500);
       syncPoints();
       switchAppView('home');
+      setTimeout(dismissSplash, 2000);
     });
   </script>
 
