@@ -134,6 +134,51 @@
     @keyframes kwSplashHide {
       to { opacity: 0; visibility: hidden; }
     }
+    /* --- Privacy Vault switch — plain CSS on purpose. The original build
+       sized the switch with Tailwind classes h-6.5 / w-5.5 / h-5.5, which
+       do not exist in Tailwind v3 (the CDN this page loads; its spacing
+       scale has 3.5 then whole numbers) — so no width/height CSS was ever
+       generated for them. The knob is absolutely positioned, so it gave
+       the button no intrinsic size: the switch collapsed to 44x0 with a
+       0x0 knob — invisible and unclickable in a real browser, even though
+       the button still worked from the keyboard. These rules depend on
+       nothing external; the on/off look follows aria-checked, which
+       applyVaultToggleUI() keeps in sync with the stored flag. */
+    .kw-vault-switch {
+      -webkit-appearance: none;
+      appearance: none;
+      display: inline-block;
+      position: relative;
+      flex-shrink: 0;
+      width: 44px;
+      height: 26px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-radius: 9999px;
+      background-color: #DADCE0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .kw-vault-switch[aria-checked="true"] {
+      background-color: #1A73E8;
+    }
+    .kw-vault-knob {
+      display: block;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background-color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(32, 33, 36, 0.35);
+      transition: transform 0.2s ease;
+      pointer-events: none;
+    }
+    .kw-vault-switch[aria-checked="true"] .kw-vault-knob {
+      transform: translateX(18px);
+    }
   </style>
 </head>
 <body class="bg-white text-inkPrimary font-sans antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-brandBlue">
@@ -1214,13 +1259,13 @@
           </button>
         </div>
         <p class="text-sm leading-relaxed text-inkSecondary">When Privacy Vault is on, this device stops keeping your activity: chats are not added to the Chat history list, and no conversation is saved to send along with your questions. Turning it on also erases the chat history stored from this session.</p>
-        <div class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-gray-50 px-4 py-3.5">
+        <div id="vault-toggle-row" onclick="togglePrivacyVault()" class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-gray-50 px-4 py-3.5 cursor-pointer">
           <div>
             <p class="text-sm font-semibold text-inkPrimary">Privacy Vault</p>
             <p id="vault-status-text" class="text-xs text-inkSecondary mt-0.5">Off — chat history is kept on this device.</p>
           </div>
-          <button id="vault-toggle" type="button" role="switch" aria-checked="false" onclick="togglePrivacyVault()" class="w-11 h-6.5 shrink-0 rounded-full bg-gray-300 relative transition-colors duration-200 cursor-pointer" aria-label="Toggle Privacy Vault">
-            <span id="vault-toggle-knob" class="absolute top-0.5 left-0.5 w-5.5 h-5.5 bg-white rounded-full shadow-xs transition-transform duration-200 block"></span>
+          <button id="vault-toggle" type="button" role="switch" aria-checked="false" onclick="event.stopPropagation(); togglePrivacyVault();" class="kw-vault-switch" aria-label="Toggle Privacy Vault">
+            <span id="vault-toggle-knob" class="kw-vault-knob"></span>
           </button>
         </div>
         <p class="mt-4 text-[11px] leading-relaxed text-inkTertiary">Only this on/off choice itself is remembered on this device — nothing about your chats or searches is stored while the Vault is on.</p>
@@ -2930,13 +2975,13 @@
     function applyVaultToggleUI() {
       const on = kwPrivacyVaultOn();
       const toggle = document.getElementById('vault-toggle');
-      const knob = document.getElementById('vault-toggle-knob');
       const status = document.getElementById('vault-status-text');
-      if (!toggle || !knob || !status) return;
+      if (!toggle || !status) return;
+      /* The switch's track colour and knob position are plain CSS keyed
+         off aria-checked (.kw-vault-switch in the head styles), so setting
+         the attribute + the status text here keeps the visible switch and
+         the words in sync on open and after every flip. */
       toggle.setAttribute('aria-checked', on ? 'true' : 'false');
-      toggle.classList.toggle('bg-brandBlue', on);
-      toggle.classList.toggle('bg-gray-300', !on);
-      knob.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
       status.textContent = on
         ? 'On — nothing is being kept on this device.'
         : 'Off — chat history is kept on this device.';
