@@ -325,6 +325,15 @@
 
     <!-- VIEW 1: HOME SEARCH HUB (Iconic, Airy, Focused) -->
     <section id="view-home" class="app-view max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-16">
+      <!-- Gemini status pill — shown ONLY when a Gemini endpoint is actually
+           configured (KW_CHAT non-empty); never decoration while unconnected. -->
+      <div id="gemini-pill-row" class="hidden flex justify-end -mt-4 sm:-mt-8 mb-4">
+        <span id="gemini-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E8F0FE] text-inkPrimary text-xs font-medium shadow-xs">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1A73E8" aria-hidden="true"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>
+          Gemini Flash API Connected
+        </span>
+      </div>
+
 
       <!-- Centered Custom 4-Color "K" + "kosher web" Wordmark — click the logo: 5-second bubbles animation (logo stays in place, bubbles move) -->
       <div id="home-hero" class="relative flex flex-col items-center text-center mb-8 select-none">
@@ -482,132 +491,99 @@
         </div>
       </div>
 
-      <!-- App Grid — the bottom of the home page is filled with app-sized kosher web apps -->
-      <div class="mt-14 max-w-3xl mx-auto">
+      <!-- App Grid — 18 kosher web apps in the owner's reference layout (3 rows of 6) -->
+      <style>
+        /* App grid 18 — the owner's reference layout: colourful flat circular
+           icons with a long-shadow look, recreated as inline SVG. */
+        .kw-apps18 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 8px; }
+        @media (min-width: 700px) { .kw-apps18 { grid-template-columns: repeat(6, 1fr); gap: 28px 10px; } }
+        .kw-app18-tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 4px 2px; background: none; border: none; cursor: pointer; font-family: inherit; }
+        .kw-app18-tile:focus-visible { outline: 2px solid #1A73E8; outline-offset: 3px; border-radius: 16px; }
+        .kw-app18-icon { display: block; transition: transform 0.18s ease; filter: drop-shadow(0 3px 5px rgba(60, 64, 67, 0.25)); }
+        .kw-app18-tile:hover .kw-app18-icon { transform: scale(1.06); }
+        .kw-app18-icon svg { display: block; width: 76px; height: 76px; }
+        @media (min-width: 700px) { .kw-app18-icon svg { width: 88px; height: 88px; } }
+        .kw-app18-label { font-size: 13.5px; font-weight: 500; color: #202124; text-align: center; line-height: 1.25; }
+        .kw-app18-badge { position: absolute; top: -2px; right: 0; background: #FFFFFF; border: 1px solid #E0E0E0; color: #202124; font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(60, 64, 67, 0.25); }
+      </style>
+      <div class="mt-14 max-w-4xl mx-auto">
         <div class="flex items-center justify-between px-1 mb-4">
           <h2 class="text-[11px] font-semibold uppercase tracking-wider text-inkSecondary">kosher web Apps</h2>
           <span class="text-[11px] font-medium text-brandBlue">Tap an app to open it</span>
         </div>
-        <div id="home-app-grid" class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-
-          <button data-app-tile="fast-search" onclick="openFastSearchApp()" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Fast Search">
-            <img src="data:image/jpeg;base64,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" alt="Fast Search" class="w-14 h-14 rounded-2xl object-cover" />
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Fast Search</span>
+        <div id="home-app-grid" class="kw-apps18">
+          <button type="button" data-app-tile="price-compare" onclick="openFastSearchApp()" class="kw-app18-tile" title="Price Compare">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC01"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC01)"><circle cx="53" cy="53" r="17" fill="rgba(0,0,0,0.13)"/><line x1="64" y1="64" x2="86" y2="86" stroke="rgba(0,0,0,0.13)" stroke-width="13" stroke-linecap="round"/><line x1="58" y1="58" x2="72" y2="72" stroke="#37474F" stroke-width="8" stroke-linecap="round"/><circle cx="40" cy="40" r="16" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><circle cx="40" cy="40" r="19.5" fill="none" stroke="#ECEFF1" stroke-width="5"/><text x="40" y="47" text-anchor="middle" font-size="19" font-weight="700" fill="#263238">$</text></g></svg></span>
+            <span class="kw-app18-label">Price Compare</span>
           </button>
-
-          <button data-app-tile="chat" onclick="switchAppView('chat')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Kosher Chat">
-            <svg class="w-14 h-14" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
-              <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
-              <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
-              <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
-              <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Kosher Chat</span>
+          <button type="button" data-app-tile="price-history" onclick="openFeatureInfo('price-history')" class="kw-app18-tile" title="Price History">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC02"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC02)"><rect x="24" y="58" width="9" height="10" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="36" y="50" width="9" height="18" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="48" y="42" width="9" height="26" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="60" y="34" width="9" height="34" fill="#4285F4" stroke="#263238" stroke-width="2"/><polyline points="39,43 53,57 63,49 79,67" stroke="rgba(0,0,0,0.13)" stroke-width="10" fill="none"/><polyline points="26,30 40,44 50,36 66,54" stroke="#FBBC05" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="57,50 68,55 63,44" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Price History</span>
           </button>
-
-          <button data-app-tile="calendar" onclick="switchAppView('calendar')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Calendar & Zmanim">
-            <svg class="w-12 h-12 text-logoBlue" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Calendar &amp; Zmanim</span>
+          <button type="button" data-app-tile="drop-alerts" onclick="openFeatureInfo('drop-alerts')" class="kw-app18-tile" title="Drop Alerts">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC03"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC03)"><path d="M58 38 a13 13 0 0 1 13 13 c0 8 2 11 4 13 H51 c2-2 4-5 4-13 a13 13 0 0 1 3-13 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 26 a13 13 0 0 1 13 13 c0 8 2 11 4 13 H31 c2-2 4-5 4-13 a13 13 0 0 1 13-13 Z" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><circle cx="48" cy="23" r="3.5" fill="#FBBC05" stroke="#263238" stroke-width="2"/><circle cx="48" cy="58" r="4" fill="#F9A825" stroke="#263238" stroke-width="2"/><g transform="rotate(18 66 30)"><rect x="58" y="20" width="17" height="22" rx="3" fill="#4285F4" stroke="#263238" stroke-width="2"/><circle cx="66.5" cy="27" r="2.6" fill="#FFFFFF"/></g></g></svg></span>
+            <span class="kw-app18-label">Drop Alerts</span>
           </button>
-
-          <button data-app-tile="cards" onclick="switchAppView('cards')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Credit Cards">
-            <svg class="w-12 h-12 text-brandBlue" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Credit Cards</span>
+          <button type="button" data-app-tile="promo-coupons" onclick="openFeatureInfo('promo-coupons')" class="kw-app18-tile" title="Promo Coupons">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC04"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EF6C00"/><g clip-path="url(#kwC04)"><rect x="30" y="44" width="58" height="30" rx="5" fill="rgba(0,0,0,0.13)"/><rect x="19" y="33" width="58" height="30" rx="5" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><line x1="35" y1="37" x2="35" y2="59" stroke="#263238" stroke-width="2" stroke-dasharray="3 3"/><text x="57" y="56" text-anchor="middle" font-size="24" font-weight="700" fill="#263238">%</text></g></svg></span>
+            <span class="kw-app18-label">Promo Coupons</span>
           </button>
-
-          <button data-app-tile="deals" onclick="switchAppView('deals')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Deals & Shopping">
-            <svg class="w-12 h-12 text-logoRed" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Deals &amp; Shopping</span>
+          <button type="button" data-app-tile="visual-search" onclick="openVisualSearchApp()" class="kw-app18-tile" title="Visual Search">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC05"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC05)"><rect x="38" y="46" width="42" height="29" rx="6" fill="rgba(0,0,0,0.13)"/><path d="M18 30 V22 a4 4 0 0 1 4-4 h8 M66 18 h8 a4 4 0 0 1 4 4 v8 M78 66 v8 a4 4 0 0 1 -4 4 h-8 M30 78 h-8 a4 4 0 0 1 -4-4 v-8" stroke="#263238" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="40" y="29" width="16" height="7" rx="3" fill="#37474F" stroke="#263238" stroke-width="2"/><rect x="27" y="35" width="42" height="29" rx="6" fill="#37474F" stroke="#263238" stroke-width="2"/><circle cx="48" cy="49.5" r="9" fill="#FFFFFF"/><circle cx="48" cy="49.5" r="5.5" fill="#4285F4" stroke="#263238" stroke-width="1.5"/><circle cx="63" cy="41" r="2" fill="#FBBC05"/></g></svg></span>
+            <span class="kw-app18-label">Visual Search</span>
           </button>
-
-          <button data-app-tile="directory" onclick="switchAppView('directory')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Directory">
-            <svg class="w-12 h-12 text-logoGreen" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Directory</span>
+          <button type="button" data-app-tile="universal-cart" onclick="openFeatureInfo('universal-cart')" class="kw-app18-tile" title="Universal Cart">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC06"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC06)"><path d="M34 34 h22 l-3 12 h-17 Z" fill="rgba(0,0,0,0.13)"/><path d="M64 32 h22 l-3 12 h-17 Z" fill="rgba(0,0,0,0.13)"/><path d="M42 60 h24 l-3 13 h-18 Z" fill="rgba(0,0,0,0.13)"/><path d="M26 26 h22 l-3 12 h-17 Z" fill="#4285F4" stroke="#263238" stroke-width="2"/><circle cx="31" cy="43" r="2.6" fill="#263238"/><circle cx="43" cy="43" r="2.6" fill="#263238"/><path d="M56 24 h22 l-3 12 h-17 Z" fill="#34A853" stroke="#263238" stroke-width="2"/><circle cx="61" cy="41" r="2.6" fill="#263238"/><circle cx="73" cy="41" r="2.6" fill="#263238"/><path d="M34 52 h24 l-3 13 h-18 Z" fill="#FBBC05" stroke="#263238" stroke-width="2"/><circle cx="39" cy="70" r="2.6" fill="#263238"/><circle cx="52" cy="70" r="2.6" fill="#263238"/></g></svg></span>
+            <span class="kw-app18-label">Universal Cart</span>
           </button>
-
-          <button data-app-tile="rewards" onclick="switchAppView('rewards')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Cash Back">
-            <svg class="w-12 h-12 text-logoGreen" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Cash Back</span>
+          <button type="button" data-app-tile="card-maximizer" onclick="openFeatureInfo('card-maximizer')" class="kw-app18-tile" title="Card Maximizer">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC07"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC07)"><rect x="39" y="54" width="40" height="26" fill="rgba(0,0,0,0.13)"/><polygon points="34,13 35.4,16.6 39.2,16.8 36.2,19.1 37.2,22.8 34,20.7 30.8,22.8 31.8,19.1 28.8,16.8 32.6,16.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><polygon points="48,10 49.4,13.6 53.2,13.8 50.2,16.1 51.2,19.8 48,17.7 44.8,19.8 45.8,16.1 42.8,13.8 46.6,13.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><polygon points="62,13 63.4,16.6 67.2,16.8 64.2,19.1 65.2,22.8 62,20.7 58.8,22.8 59.8,19.1 56.8,16.8 60.6,16.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><rect x="25" y="33" width="46" height="10" fill="#EA4335" stroke="#263238" stroke-width="2"/><rect x="33" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="45" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="57" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="28" y="43" width="40" height="26" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="33" y="52" width="10" height="17" fill="#4285F4" stroke="#263238" stroke-width="1.5"/><rect x="48" y="52" width="14" height="11" fill="#A8C7FA" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Card Maximizer</span>
           </button>
-
-          <button data-app-tile="sponsor" onclick="switchAppView('sponsor')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Open Sponsor">
-            <svg class="w-12 h-12 text-logoYellow" fill="currentColor" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Sponsor</span>
+          <button type="button" data-app-tile="cashback-live" onclick="openFeatureInfo('cashback-live')" class="kw-app18-tile" title="Cashback Live">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC08"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC08)"><ellipse cx="57" cy="63" rx="19" ry="14.5" fill="rgba(0,0,0,0.13)"/><path d="M40 22 q14 -8 24 2" stroke="#FBBC05" stroke-width="5" fill="none" stroke-linecap="round"/><polygon points="59,17 70,24 58.5,28.5" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/><ellipse cx="46" cy="52" rx="19" ry="14.5" fill="#F48FB1" stroke="#263238" stroke-width="2.5"/><circle cx="62" cy="48" r="9" fill="#F48FB1" stroke="#263238" stroke-width="2.5"/><ellipse cx="68" cy="49" rx="4" ry="5" fill="#F8BBD0" stroke="#263238" stroke-width="1.5"/><polygon points="52,36 58,32 59,40" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><circle cx="60" cy="46" r="1.6" fill="#263238"/><rect x="34" y="64" width="5" height="6" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><rect x="52" y="64" width="5" height="6" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><path d="M27 48 q-6 -4 -3 -9" stroke="#263238" stroke-width="2" fill="none" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Cashback Live</span>
           </button>
-
-          <button data-app-tile="ai-fast-search" onclick="focusHomeSearch()" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="AI Fast Search — jump to the search bar">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="10.5" cy="10.5" r="7" stroke="#4285F4" stroke-width="2" />
-              <line x1="15.8" y1="15.8" x2="21" y2="21" stroke="#EA4335" stroke-width="2.4" stroke-linecap="round" />
-              <text x="10.5" y="13.2" text-anchor="middle" font-family="Inter, sans-serif" font-size="6.5" font-weight="700" fill="#4285F4">AI</text>
-              <path d="M19.5 1.5 L20.1 3.2 L21.8 3.8 L20.1 4.4 L19.5 6.1 L18.9 4.4 L17.2 3.8 L18.9 3.2 Z" fill="#FBBC05" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">AI Fast Search</span>
+          <button type="button" data-app-tile="daily-points" onclick="openFeatureInfo('daily-points')" class="kw-app18-tile" title="Daily Points">
+            <span class="kw-app18-badge">+1,300 pts</span><span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC09"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC09)"><rect x="39" y="55" width="38" height="26" fill="rgba(0,0,0,0.13)"/><ellipse cx="41" cy="30" rx="6" ry="4" fill="#EA4335" stroke="#263238" stroke-width="1.5"/><ellipse cx="53" cy="30" rx="6" ry="4" fill="#EA4335" stroke="#263238" stroke-width="1.5"/><rect x="28" y="44" width="38" height="26" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><rect x="25" y="35" width="44" height="10" fill="#EA4335" stroke="#263238" stroke-width="2.5"/><rect x="43" y="35" width="8" height="35" fill="#EA4335"/><circle cx="66" cy="66" r="11" fill="#4285F4" stroke="#263238" stroke-width="2"/><polygon points="66,59.5 67.9,64 72.5,64.3 68.9,67.2 70,71.7 66,69.2 62,71.7 63.1,67.2 59.5,64.3 64.1,64" fill="#FBBC05"/></g></svg></span>
+            <span class="kw-app18-label">Daily Points</span>
           </button>
-
-          <button data-app-tile="web-ai-assistant" onclick="switchAppView('chat')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Web AI Assistant — opens Kosher Chat">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="kwAssistantGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#7C4DFF" />
-                  <stop offset="0.55" stop-color="#E040FB" />
-                  <stop offset="1" stop-color="#FF7043" />
-                </linearGradient>
-              </defs>
-              <path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.5 5.1 3.8 6.6-.1 1.2-.6 2.6-1.5 3.7 2-.1 3.9-.9 5.2-1.9.8.2 1.6.3 2.5.3 5.5 0 10-3.9 10-8.7S17.5 3 12 3Z" fill="url(#kwAssistantGrad)" />
-              <circle cx="7.6" cy="11.7" r="1.5" fill="#FFFFFF" />
-              <circle cx="12" cy="11.7" r="1.5" fill="#FFFFFF" />
-              <circle cx="16.4" cy="11.7" r="1.5" fill="#FFFFFF" />
-              <path d="M19.8 1.2 L20.3 2.6 L21.7 3.1 L20.3 3.6 L19.8 5 L19.3 3.6 L17.9 3.1 L19.3 2.6 Z" fill="#FBBC05" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Web AI Assistant</span>
+          <button type="button" data-app-tile="zmanim-shabbos" onclick="switchAppView('calendar')" class="kw-app18-tile" title="Zmanim &amp; Shabbos">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC10"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#283593"/><g clip-path="url(#kwC10)"><rect x="38" y="54" width="7" height="22" fill="rgba(0,0,0,0.18)"/><rect x="30" y="44" width="7" height="22" fill="#FFF3E0" stroke="#263238" stroke-width="1.5"/><rect x="41" y="44" width="7" height="22" fill="#FFF3E0" stroke="#263238" stroke-width="1.5"/><path d="M33.5 27 c3 4 3 7 0 9 c-3 -2 -3 -5 0 -9 Z" fill="#FF9800" stroke="#E65100" stroke-width="1"/><path d="M44.5 27 c3 4 3 7 0 9 c-3 -2 -3 -5 0 -9 Z" fill="#FF9800" stroke="#E65100" stroke-width="1"/><rect x="27" y="66" width="13" height="4" fill="#FBBC05" stroke="#263238" stroke-width="1"/><rect x="38" y="66" width="13" height="4" fill="#FBBC05" stroke="#263238" stroke-width="1"/><polygon points="62,18 63.6,22.4 68,24 63.6,25.6 62,30 60.4,25.6 56,24 60.4,22.4" fill="#FBBC05"/><polygon points="76,26 77.2,29.8 81,31 77.2,32.2 76,36 74.8,32.2 71,31 74.8,29.8" fill="#FBBC05"/><circle cx="66" cy="56" r="13" fill="#FFFFFF" stroke="#FBBC05" stroke-width="3"/><line x1="66" y1="56" x2="66" y2="47" stroke="#263238" stroke-width="2" stroke-linecap="round"/><line x1="66" y1="56" x2="71" y2="59" stroke="#263238" stroke-width="2" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Zmanim &amp; Shabbos</span>
           </button>
-
-          <button data-app-tile="upload-analyze" onclick="showToast('Upload &amp; Analyze — document analysis arrives when Kosher Chat connects.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Upload & Analyze (feature)">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M6 2.5h8L19 7.5v14H6z" stroke="#5F6368" stroke-width="1.8" fill="#F8F9FA" />
-              <path d="M14 2.5v5h5" stroke="#5F6368" stroke-width="1.8" fill="none" />
-              <line x1="12" y1="17.5" x2="12" y2="10.5" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" />
-              <polyline points="8.8,13.4 12,10.2 15.2,13.4" stroke="#1A73E8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <line x1="8" y1="20" x2="16" y2="20" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Upload &amp; Analyze</span>
+          <button type="button" data-app-tile="kosher-directory" onclick="switchAppView('directory')" class="kw-app18-tile" title="Kosher Directory">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC11"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC11)"><polygon points="24,38 40,32 56,38 72,32 72,62 56,68 40,62 24,68" fill="#A8C7FA" stroke="#263238" stroke-width="2"/><polygon points="56,38 72,32 72,47 56,52" fill="#66BB6A" opacity="0.85"/><line x1="40" y1="32" x2="40" y2="62" stroke="#263238" stroke-width="1.5" opacity="0.45"/><line x1="56" y1="38" x2="56" y2="68" stroke="#263238" stroke-width="1.5" opacity="0.45"/><polyline points="24,56 44,50 72,44" stroke="#FBBC05" stroke-width="3.5" fill="none"/><path d="M57 28 a11 11 0 0 1 11 11 c0 8 -11 19 -11 19 s-11 -11 -11 -19 a11 11 0 0 1 11 -11 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 18 a11 11 0 0 1 11 11 c0 8 -11 19 -11 19 s-11 -11 -11 -19 a11 11 0 0 1 11 -11 Z" fill="#EA4335" stroke="#263238" stroke-width="2"/><circle cx="48" cy="29" r="4.5" fill="#FFFFFF"/></g></svg></span>
+            <span class="kw-app18-label">Kosher Directory</span>
           </button>
-
-          <button data-app-tile="automated-tasker" onclick="showToast('Automated Tasker — workflow automations arrive when the assistant connects.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Automated Tasker (feature)">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="3" y="5" width="15" height="14" rx="2.5" stroke="#5F6368" stroke-width="1.8" fill="#FFFFFF" />
-              <path d="M3 8.5a2.5 2.5 0 0 1 2.5-2.5h10A2.5 2.5 0 0 1 18 8.5v1H3z" fill="#EA4335" />
-              <polyline points="6.8,14.6 9.3,17.1 13.6,12.6" stroke="#34A853" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <circle cx="18.6" cy="18.2" r="2.6" stroke="#1A73E8" stroke-width="1.8" fill="#FFFFFF" />
-              <path d="M18.6 14.6v1.6M18.6 20.2v1.6M15 18.2h1.6M20.2 18.2h1.6M16.1 15.7l1.1 1.1M19.9 19.6l1.1 1.1M21 15.7l-1.1 1.1M17.2 19.6l-1.1 1.1" stroke="#1A73E8" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Automated Tasker</span>
+          <button type="button" data-app-tile="concierge" onclick="switchAppView('chat')" class="kw-app18-tile" title="Concierge">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC12"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC12)"><rect x="40" y="56" width="38" height="25" fill="rgba(0,0,0,0.13)"/><rect x="30" y="22" width="36" height="10" rx="2" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><text x="48" y="29.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="#263238" letter-spacing="0.5">BOUTIQUE</text><rect x="26" y="36" width="44" height="9" fill="#EA4335" stroke="#263238" stroke-width="2"/><rect x="34" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="45.5" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="57" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="29" y="45" width="38" height="25" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="33" y="51" width="15" height="13" fill="#A8C7FA" stroke="#263238" stroke-width="1.5"/><line x1="36" y1="61" x2="43" y2="54" stroke="#FFFFFF" stroke-width="1.8"/><rect x="54" y="51" width="10" height="19" fill="#4285F4" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Concierge</span>
           </button>
-
-          <button data-app-tile="secure-checkout" onclick="showToast('Secure Checkout — planned with Stripe; not live yet.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Secure Checkout (feature)">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="1.5" y="5" width="17" height="12" rx="2.5" fill="#4285F4" />
-              <rect x="1.5" y="8" width="17" height="2.6" fill="#FFFFFF" opacity="0.85" />
-              <rect x="14.2" y="13.2" width="7.4" height="6.4" rx="1.6" fill="#FBBC05" />
-              <path d="M16 13.2v-1.4a1.9 1.9 0 0 1 3.8 0v1.4" stroke="#F9A825" stroke-width="1.7" fill="none" />
-              <circle cx="17.9" cy="16.4" r="1.1" fill="#FFFFFF" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Secure Checkout</span>
+          <button type="button" data-app-tile="shabbos-lists" onclick="openShabbosLists()" class="kw-app18-tile" title="Shabbos Lists">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC13"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EF6C00"/><g clip-path="url(#kwC13)"><rect x="40" y="31" width="38" height="56" rx="5" fill="rgba(0,0,0,0.13)"/><rect x="29" y="20" width="38" height="56" rx="5" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="40" y="14" width="16" height="10" rx="3" fill="#90A4AE" stroke="#263238" stroke-width="2"/><circle cx="48" cy="19" r="2" fill="#FFFFFF"/><polyline points="37,38 40,41 45,35" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="38" x2="61" y2="38" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/><polyline points="37,50 40,53 45,47" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="50" x2="61" y2="50" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/><polyline points="37,62 40,65 45,59" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="62" x2="61" y2="62" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Shabbos Lists</span>
           </button>
-
-          <button data-app-tile="image-moderation" onclick="showToast('Image Moderation — listings will be screened so product images never show people.')" class="tactile-btn bg-white border border-hairline rounded-3xl shadow-elevation-1 hover:shadow-elevation-2 p-4 flex flex-col items-center justify-center gap-2.5 min-h-[118px]" title="Image Moderation (feature)">
-            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="2" y="3.5" width="17" height="13" rx="2.5" stroke="#5F6368" stroke-width="1.8" fill="#FFFFFF" />
-              <circle cx="7.6" cy="8" r="1.5" fill="#FBBC05" />
-              <path d="M3.5 15.5l4.2-4.2 3 3 3.4-3.4 3.4 3.4" stroke="#4285F4" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M17.4 13.6l4.1 1.7v3.1c0 2.5-1.7 4-4.1 4.9-2.4-.9-4.1-2.4-4.1-4.9v-3.1z" fill="#34A853" />
-              <polyline points="15.4,18.6 16.7,19.9 19.4,17" stroke="#FFFFFF" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span class="text-[13px] font-medium text-inkPrimary leading-tight text-center">Image Moderation</span>
+          <button type="button" data-app-tile="image-shield" onclick="openFeatureInfo('image-shield')" class="kw-app18-tile" title="Image Shield">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC14"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#283593"/><g clip-path="url(#kwC14)"><path d="M57 26 L83 35 V58 c0 17 -11 27 -26 33 c-8 -3.2 -14.7 -7.7 -19.4 -13.6 C41.9 83.6 49 88.4 57 91 Z" fill="rgba(0,0,0,0.18)"/><path d="M48 16 L74 25 V48 c0 17 -11 27 -26 33 c-15 -6 -26 -16 -26 -33 V25 Z" fill="#4285F4" stroke="#1A237E" stroke-width="2"/><path d="M48 16 L74 25 V48 c0 17 -11 27 -26 33 Z" fill="#3367D6"/><ellipse cx="48" cy="46" rx="13" ry="9" fill="#FFFFFF"/><circle cx="48" cy="46" r="5.5" fill="#1A73E8"/><circle cx="48" cy="46" r="2.6" fill="#202124"/><circle cx="50" cy="43.5" r="1.3" fill="#FFFFFF"/></g></svg></span>
+            <span class="kw-app18-label">Image Shield</span>
           </button>
-
+          <button type="button" data-app-tile="clean-reader" onclick="openFeatureInfo('clean-reader')" class="kw-app18-tile" title="Clean Reader">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC15"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC15)"><path d="M58 40 C49 33 38 32 29 35 V80 c9 -3 20 -2 29 4 c9 -6 20 -7 29 -4 V35 C78 32 67 33 58 40 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 29 C39 22 28 21 19 24 V69 c9 -3 20 -2 29 4 c9 -6 20 -7 29 -4 V24 C68 21 57 22 48 29 Z" fill="#1A73E8"/><path d="M48 32 C40 26 30 25 22 27 V66 c8 -2 18 -1 26 5 c8 -6 18 -7 26 -5 V27 C66 25 56 26 48 32 Z" fill="#FFFFFF"/><line x1="48" y1="32" x2="48" y2="71" stroke="#BDBDBD" stroke-width="1.5"/><rect x="28" y="42" width="15" height="11" rx="5" fill="#263238"/><rect x="53" y="42" width="15" height="11" rx="5" fill="#263238"/><path d="M43 45 q5 -3 10 0" stroke="#263238" stroke-width="2.5" fill="none"/></g></svg></span>
+            <span class="kw-app18-label">Clean Reader</span>
+          </button>
+          <button type="button" data-app-tile="gmail-calendar" onclick="openFeatureInfo('gmail-calendar')" class="kw-app18-tile" title="Gmail &amp; Calendar">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC16"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC16)"><rect x="31" y="41" width="46" height="34" rx="4" fill="rgba(0,0,0,0.13)"/><rect x="20" y="30" width="46" height="34" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><path d="M22 33 L43 50 L64 33" stroke="#EA4335" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="52" width="26" height="24" rx="3" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><path d="M52 55 a3 3 0 0 1 3 -3 h20 a3 3 0 0 1 3 3 v4 H52 Z" fill="#EA4335"/><rect x="56" y="62" width="5" height="5" fill="#4285F4"/><rect x="64" y="62" width="5" height="5" fill="#4285F4"/><rect x="56" y="69" width="5" height="5" fill="#4285F4"/><rect x="64" y="69" width="5" height="5" fill="#4285F4"/></g></svg></span>
+            <span class="kw-app18-label">Gmail &amp; Calendar</span>
+          </button>
+          <button type="button" data-app-tile="privacy-vault" onclick="openPrivacyVault()" class="kw-app18-tile" title="Privacy Vault">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC17"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC17)"><ellipse cx="58" cy="52" rx="24" ry="5.5" fill="rgba(0,0,0,0.13)"/><path d="M32 40 a16 9 0 0 1 32 0 Z" fill="#37474F" stroke="#263238" stroke-width="2"/><ellipse cx="48" cy="41" rx="24" ry="5.5" fill="#263238"/><rect x="29" y="48" width="15" height="10" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><rect x="52" y="48" width="15" height="10" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><line x1="44" y1="51" x2="52" y2="51" stroke="#263238" stroke-width="2"/><rect x="33" y="62" width="30" height="17" rx="3" fill="#ECEFF1" stroke="#263238" stroke-width="2"/><path d="M45.5 68 v-2.5 a2.5 2.5 0 0 1 5 0 V68" stroke="#263238" stroke-width="1.5" fill="none"/><rect x="43" y="68" width="10" height="8" rx="2" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Privacy Vault</span>
+          </button>
+          <button type="button" data-app-tile="price-match" onclick="openFeatureInfo('price-match')" class="kw-app18-tile" title="Price Match">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC18"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#E65100"/><g clip-path="url(#kwC18)"><polygon points="38,40 78,72 70,80 30,48" fill="rgba(0,0,0,0.13)"/><g transform="rotate(-35 48 44)"><rect x="28" y="30" width="34" height="13" rx="3" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><rect x="33" y="30" width="5" height="13" fill="#795548"/><rect x="52" y="30" width="5" height="13" fill="#795548"/><rect x="42" y="43" width="6" height="24" rx="3" fill="#795548" stroke="#263238" stroke-width="2"/></g><rect x="30" y="72" width="30" height="5" rx="2" fill="#795548" stroke="#263238" stroke-width="2"/><rect x="26" y="79" width="38" height="4" rx="2" fill="#5D4037"/></g></svg></span>
+            <span class="kw-app18-label">Price Match</span>
+          </button>
         </div>
       </div>
     </section>
@@ -990,6 +966,14 @@
 
     <!-- VIEW 8: KOSHER CHAT — BUSINESS AI ASSISTANT (layout per owner's chat mock) -->
     <section id="view-chat" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <style>
+        /* Waiting indicator: four bouncing dots in the brand colours
+           (blue, red, yellow, green — the owner's typing-dots image),
+           Google-style, shown while Kosher Chat waits for the back end. */
+        .kw-chat-typing { display: inline-flex; align-items: center; gap: 5px; padding: 3px 0; }
+        .kw-chat-dot { width: 8px; height: 8px; border-radius: 9999px; display: inline-block; animation: kwChatDotBounce 1.15s ease-in-out infinite; }
+        @keyframes kwChatDotBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+      </style>
       <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 overflow-hidden flex h-[72vh] min-h-[540px]">
 
         <!-- Dark Sidebar: Chat + Chat History -->
@@ -1043,7 +1027,7 @@
                 <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
               </svg>
               <h2 class="text-2xl sm:text-[28px] font-normal text-inkPrimary leading-snug">Hi, how can I help your business today?</h2>
-              <p class="text-sm text-inkSecondary mt-3 max-w-md leading-relaxed">Kosher Chat is the kosher web assistant for business questions. It is being connected now — you can already start the conversation below.</p>
+              <p id="chat-hero-sub" class="text-sm text-inkSecondary mt-3 max-w-md leading-relaxed">Kosher Chat is the kosher web assistant for business questions. It is being connected now — you can already start the conversation below.</p>
             </div>
             <div id="chat-thread" class="space-y-4"></div>
           </div>
@@ -1089,7 +1073,7 @@
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
               </button>
             </div>
-            <p class="text-[11px] text-inkSecondary text-center mt-2.5">Kosher Chat is for business questions. The assistant is being connected — answers will appear here soon.</p>
+            <p id="chat-status-note" class="text-[11px] text-inkSecondary text-center mt-2.5">Kosher Chat is for business questions. The assistant is being connected — answers will appear here soon.</p>
           </div>
         </div>
       </div>
@@ -1197,6 +1181,68 @@
         <button onclick="completeSignIn()" class="tactile-btn w-full py-2.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-sm font-semibold">
           Continue
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Explainer Modal — honest status for features that are not
+       live yet (no fake controls) -->
+  <div id="feature-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('feature-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-3">
+          <h3 id="feature-modal-title" class="text-xl font-bold text-inkPrimary">Feature</h3>
+          <button onclick="closeModal('feature-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <span id="feature-modal-status" class="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-brandBlue text-[11px] font-semibold"></span>
+        <p id="feature-modal-body" class="mt-4 text-sm leading-relaxed text-inkSecondary"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Vault Modal — REAL feature: a single on/off flag on this
+       device; while on, chat history is not kept and nothing is stored -->
+  <div id="privacy-vault-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('privacy-vault-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-3">
+          <h3 class="text-xl font-bold text-inkPrimary">Privacy Vault</h3>
+          <button onclick="closeModal('privacy-vault-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <p class="text-sm leading-relaxed text-inkSecondary">When Privacy Vault is on, this device stops keeping your activity: chats are not added to the Chat history list, and no conversation is saved to send along with your questions. Turning it on also erases the chat history stored from this session.</p>
+        <div class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-gray-50 px-4 py-3.5">
+          <div>
+            <p class="text-sm font-semibold text-inkPrimary">Privacy Vault</p>
+            <p id="vault-status-text" class="text-xs text-inkSecondary mt-0.5">Off — chat history is kept on this device.</p>
+          </div>
+          <button id="vault-toggle" type="button" role="switch" aria-checked="false" onclick="togglePrivacyVault()" class="w-11 h-6.5 shrink-0 rounded-full bg-gray-300 relative transition-colors duration-200 cursor-pointer" aria-label="Toggle Privacy Vault">
+            <span id="vault-toggle-knob" class="absolute top-0.5 left-0.5 w-5.5 h-5.5 bg-white rounded-full shadow-xs transition-transform duration-200 block"></span>
+          </button>
+        </div>
+        <p class="mt-4 text-[11px] leading-relaxed text-inkTertiary">Only this on/off choice itself is remembered on this device — nothing about your chats or searches is stored while the Vault is on.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shabbos Lists Modal — REAL feature: pre-built checklists, ticks
+       saved on this device only; no prices (bundle pricing is later) -->
+  <div id="shabbos-lists-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('shabbos-lists-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-xl font-bold text-inkPrimary">Shabbos &amp; Yom Tov Lists</h3>
+          <button onclick="closeModal('shabbos-lists-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <p class="text-sm leading-relaxed text-inkSecondary">Ready-made checklists — tick items off as you pack them away. Your ticks are saved on this device.</p>
+        <div id="shabbos-lists-body" class="mt-4"></div>
+        <button type="button" onclick="clearShabbosLists()" class="mt-5 text-xs font-semibold text-brandBlue hover:underline cursor-pointer">Clear all ticks</button>
+        <p class="mt-3 text-[11px] leading-relaxed text-inkTertiary">One-click bundle pricing across stores arrives in a later phase — these lists don't show prices yet.</p>
       </div>
     </div>
   </div>
@@ -2533,14 +2579,33 @@
       openModal('store-modal');
     }
 
-    // --- Kosher Chat (business assistant — the AI back end connects in a later step; replies stay honest until then) ---
+    // --- Kosher Chat (business assistant) ---
+    // KW_CHAT is the chat back end's base URL (the kosher-web chat-backend
+    // service) and the single wiring point for the live connection: while
+    // it is empty the chat keeps its honest "being connected" replies;
+    // when the wiring step sets it to the deployed service URL, messages
+    // are answered live by the back end (see requestChatReply below).
+    const KW_CHAT = "";
     let chatStarted = false;
     let chatReplyCount = 0;
     let chatParamsOn = false;
     let chatParamScope = 'all';
+    let chatHistory = []; // { role: 'user' | 'assistant', text } — sent with each live request (last 10 turns)
     const CHAT_MARK_SVG = '<svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5"/><path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05"/><path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335"/></svg>';
     const CHAT_NOT_CONNECTED_FIRST = 'Thanks for your message. Kosher Chat is still being connected, so it cannot answer business questions just yet. Soon this chat will help with kosher business search, deals, zmanim and verified contacts — your message stays right here in this chat.';
     const CHAT_NOT_CONNECTED_AGAIN = 'Kosher Chat is still being connected — as soon as the assistant is live, it will answer your business questions right here.';
+    const CHAT_UNREACHABLE = 'Sorry — I couldn\'t reach the assistant just now. Please try again in a moment.';
+    const CHAT_DOT_COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853']; // blue, red, yellow, green — the owner's typing-dots image
+
+    // The explainer lines claim "being connected" only while no back end
+    // is wired; with KW_CHAT set they simply describe the assistant.
+    (function applyChatModeText() {
+      if (!KW_CHAT) return;
+      const heroSub = document.getElementById('chat-hero-sub');
+      if (heroSub) heroSub.textContent = 'Kosher Chat is the kosher web assistant for business questions. Ask about running your business — the answer comes right here in the chat.';
+      const note = document.getElementById('chat-status-note');
+      if (note) note.textContent = 'Kosher Chat is for business questions.';
+    })();
 
     function appendChatBubble(text, who) {
       const thread = document.getElementById('chat-thread');
@@ -2568,6 +2633,78 @@
       if (scroller) scroller.scrollTop = scroller.scrollHeight;
     }
 
+    // Assistant bubble holding the four bouncing dots while the back end
+    // answers. Returns the bubble element so the reply can replace the dots.
+    function appendChatWaitingBubble() {
+      const thread = document.getElementById('chat-thread');
+      if (!thread) return null;
+      const row = document.createElement('div');
+      row.className = 'flex items-start gap-2.5';
+      const avatar = document.createElement('div');
+      avatar.className = 'w-8 h-8 shrink-0';
+      avatar.innerHTML = CHAT_MARK_SVG;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble-assistant chat-bubble-waiting max-w-[80%] bg-white border border-hairline px-4 py-2.5 rounded-3xl rounded-tl-lg shadow-xs';
+      const typing = document.createElement('span');
+      typing.className = 'kw-chat-typing';
+      typing.setAttribute('role', 'status');
+      typing.setAttribute('aria-label', 'Kosher Chat is typing');
+      const dotDelays = ['0s', '0.15s', '0.3s', '0.45s'];
+      CHAT_DOT_COLORS.forEach((color, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'kw-chat-dot';
+        dot.style.backgroundColor = color;
+        dot.style.animationDelay = dotDelays[i];
+        typing.appendChild(dot);
+      });
+      bubble.appendChild(typing);
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      thread.appendChild(row);
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+      return bubble;
+    }
+
+    function setChatBubbleText(bubble, text) {
+      if (!bubble) return;
+      bubble.textContent = text;
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    }
+
+    // Live path: POST { message, history } to the chat back end and swap
+    // the waiting dots for the reply. Any failure (network, HTTP error,
+    // empty reply) lands on one honest message — the conversation itself
+    // is never touched.
+    function requestChatReply(text, history, waitingBubble) {
+      const fail = () => setChatBubbleText(waitingBubble, CHAT_UNREACHABLE);
+      if (typeof fetch !== 'function') { fail(); return; }
+      let ctrl = null;
+      let timer = null;
+      if (typeof AbortController !== 'undefined') {
+        ctrl = new AbortController();
+        timer = setTimeout(() => { try { ctrl.abort(); } catch (e) { /* noop */ } }, 30000);
+      }
+      const done = () => { if (timer) clearTimeout(timer); };
+      fetch(KW_CHAT.replace(/\/+$/, '') + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history }),
+        signal: ctrl ? ctrl.signal : undefined
+      }).then((res) => {
+        if (!res || !res.ok) throw new Error('chat request failed');
+        return res.json();
+      }).then((data) => {
+        done();
+        const reply = data && typeof data.reply === 'string' ? data.reply.trim() : '';
+        if (!reply) throw new Error('chat reply empty');
+        setChatBubbleText(waitingBubble, reply);
+        if (!kwPrivacyVaultOn()) chatHistory.push({ role: 'assistant', text: reply });
+        chatReplyCount++;
+      }).catch(() => { done(); fail(); });
+    }
+
     function addChatHistoryEntry(text) {
       const list = document.getElementById('chat-history-list');
       if (!list) return;
@@ -2589,13 +2726,23 @@
       if (hero) hero.classList.add('hidden');
       if (!chatStarted) {
         chatStarted = true;
-        addChatHistoryEntry(text);
+        if (!kwPrivacyVaultOn()) addChatHistoryEntry(text);
       }
+      // WhatsApp feel: the visitor's bubble appears instantly, before
+      // any waiting indicator or network round-trip.
       appendChatBubble(text, 'user');
-      setTimeout(() => {
-        appendChatBubble(chatReplyCount === 0 ? CHAT_NOT_CONNECTED_FIRST : CHAT_NOT_CONNECTED_AGAIN, 'assistant');
-        chatReplyCount++;
-      }, 500);
+      if (!KW_CHAT) {
+        // No back end wired yet — the honest "being connected" reply.
+        setTimeout(() => {
+          appendChatBubble(chatReplyCount === 0 ? CHAT_NOT_CONNECTED_FIRST : CHAT_NOT_CONNECTED_AGAIN, 'assistant');
+          chatReplyCount++;
+        }, 500);
+        return;
+      }
+      const historySnapshot = kwPrivacyVaultOn() ? [] : chatHistory.slice(-10);
+      if (!kwPrivacyVaultOn()) chatHistory.push({ role: 'user', text: text });
+      const waitingBubble = appendChatWaitingBubble();
+      requestChatReply(text, historySnapshot, waitingBubble);
     }
 
     function startNewChat() {
@@ -2605,6 +2752,7 @@
       if (hero) hero.classList.remove('hidden');
       chatStarted = false;
       chatReplyCount = 0;
+      chatHistory = [];
       const input = document.getElementById('chat-input');
       if (input) { input.value = ''; try { input.focus(); } catch (e) { /* focus is cosmetic */ } }
     }
@@ -2658,6 +2806,258 @@
       switchAppView('home');
       setTimeout(dismissSplash, 2000);
     });
+  </script>
+
+  <script>
+    /* ==================== APP GRID 18 — FEATURE WIRING ====================
+       Tiles that are live open their real view/feature. Tiles that are not
+       built yet open an honest explainer (FEATURE_INFO) — no fake controls.
+       Privacy Vault and Shabbos Lists are real, working features below. */
+
+    const FEATURE_INFO = {
+      'price-history': {
+        title: 'Price History & Fake-Deal Detector',
+        status: 'Phase 2 — needs price data over time',
+        body: "Every item will carry a 12-month price chart, so you can see whether a Today's Special is a genuine lowest-ever price or an inflated markup. The specials pipeline has started collecting prices — the charts arrive once there is real history to show. Nothing here is drawn from invented data."
+      },
+      'drop-alerts': {
+        title: 'Drop Alerts — Target-Price Alerts',
+        status: 'Phase 1 — building on the specials pipeline',
+        body: "Set a target price for a product and get an instant alert the moment the price drops to it. Drop Alerts ride the same live price pipeline as Today's Specials (Firecrawl + SerpApi) — the alert switch turns on when the live price pulls start."
+      },
+      'promo-coupons': {
+        title: 'Promo Coupons — Auto-Coupon Stacking',
+        status: 'Phase 2 — after the locked checkout',
+        body: 'Verified affiliate promo codes will be tested and applied automatically at checkout, so you always pay the lowest net price without hunting for codes. This needs the locked checkout to exist first — it is a Phase 2 feature.'
+      },
+      'universal-cart': {
+        title: 'Universal Cart',
+        status: 'Phase 2 — after the locked checkout',
+        body: 'One cart for items from Walmart, Amazon, Best Buy and specialty stores, finished in a single locked checkout. The shared cart is planned together with the secure checkout — it is not live yet, and no store is charged through kosher web today.'
+      },
+      'card-maximizer': {
+        title: 'Card Maximizer Badge',
+        status: 'Planned — card types only, never numbers',
+        body: "Tell kosher web which card types you carry — by nickname only, like 'Amex Blue Cash'. kosher web will never ask for or store card numbers. A badge on each product will then show which of your cards earns the most back on that purchase."
+      },
+      'cashback-live': {
+        title: 'Cashback Live',
+        status: 'Phase 2 — needs live affiliate tracking',
+        body: 'Your wallet will show every cash back earning as it moves: Clicked, then Pending, then Confirmed — in real time. That ticker needs live affiliate tracking connected first. Until then, the Rewards wallet shows your balance and claims as it does today.'
+      },
+      'daily-points': {
+        title: 'Daily Points',
+        status: 'Phase 2 — with the points engine',
+        body: 'Earn bonus platform points for daily check-ins and search streaks, feeding your tier (Silver / Gold / Platinum). Points boosts arrive with the full points & cashback engine — the daily streak in the Rewards wallet already works today.'
+      },
+      'image-shield': {
+        title: 'Image Shield — Product-Only Images',
+        status: 'Already guarding Today’s Specials',
+        body: "Every product image pulled into Today's Specials passes the Image Shield first: images that show people are blocked, or replaced with a clean product-only shot, before they can appear. The shield is being extended across the whole site in Phase 1."
+      },
+      'clean-reader': {
+        title: 'Clean Reader',
+        status: 'Planned',
+        body: 'Product reviews and buying guides will open in a clean reading view — the content and verified ratings only, with pop-ups, banners and tracking scripts stripped away.'
+      },
+      'gmail-calendar': {
+        title: 'Gmail & Calendar Glance',
+        status: 'Planned — needs your Google sign-in',
+        body: 'A small pill in the top bar will show your unread email count and upcoming calendar events, and open Gmail or Calendar in one tap. It works through Google sign-in (OAuth) — nothing is connected or read until you sign in yourself.'
+      },
+      'price-match': {
+        title: 'Price-Match Claim',
+        status: 'Planned',
+        body: 'Buy through kosher web and, if the price drops within 7 days, one tap will pre-fill a price-adjustment claim for the retailer or your card. The claim button arrives with the checkout and order tracking.'
+      }
+    };
+
+    function showFeatureInfo(info) {
+      document.getElementById('feature-modal-title').textContent = info.title;
+      document.getElementById('feature-modal-status').textContent = info.status;
+      document.getElementById('feature-modal-body').textContent = info.body;
+      openModal('feature-modal');
+    }
+
+    function openFeatureInfo(key) {
+      const info = FEATURE_INFO[key];
+      if (info) showFeatureInfo(info);
+    }
+
+    // Visual Search lives in Kosher Chat once the Gemini connection is live;
+    // until then the explainer says exactly that (state follows KW_CHAT).
+    function openVisualSearchApp() {
+      switchAppView('chat');
+      if (typeof KW_CHAT !== 'undefined' && KW_CHAT) {
+        showFeatureInfo({
+          title: 'Visual Search',
+          status: 'Available through Kosher Chat',
+          body: 'Photo search is connected: open Kosher Chat and describe or attach the product photo — the assistant finds matching items and the best cash back route. (Snap & Match, the full photo-matching engine, is a Phase 2 build on the same connection.)'
+        });
+      } else {
+        showFeatureInfo({
+          title: 'Visual Search',
+          status: 'Arrives with the Gemini connection',
+          body: 'Snap a photo of any product and kosher web will find it and show the best cash back route. Photo search runs on the Gemini connection — it switches on here as soon as Kosher Chat is connected. Nothing to set up on your side.'
+        });
+      }
+    }
+
+    /* ---------------- Privacy Vault (REAL) ----------------
+       A single on/off flag in localStorage (key kw-privacy-vault) is the
+       ONLY thing the Vault ever stores. While on: the session's stored chat
+       history is purged, chats are not added to the history list, and no
+       conversation history is kept or sent with questions. */
+    const KW_VAULT_KEY = 'kw-privacy-vault';
+
+    function kwPrivacyVaultOn() {
+      try { return localStorage.getItem(KW_VAULT_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    function kwPurgeChatHistory() {
+      if (typeof startNewChat === 'function') startNewChat();
+      const list = document.getElementById('chat-history-list');
+      if (list) {
+        list.innerHTML = '';
+        const note = document.createElement('p');
+        note.id = 'chat-history-empty';
+        note.className = 'px-3 text-xs leading-relaxed text-white/40';
+        note.textContent = 'No chats yet — your conversations will appear here.';
+        list.appendChild(note);
+      }
+    }
+
+    function applyVaultToggleUI() {
+      const on = kwPrivacyVaultOn();
+      const toggle = document.getElementById('vault-toggle');
+      const knob = document.getElementById('vault-toggle-knob');
+      const status = document.getElementById('vault-status-text');
+      if (!toggle || !knob || !status) return;
+      toggle.setAttribute('aria-checked', on ? 'true' : 'false');
+      toggle.classList.toggle('bg-brandBlue', on);
+      toggle.classList.toggle('bg-gray-300', !on);
+      knob.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+      status.textContent = on
+        ? 'On — nothing is being kept on this device.'
+        : 'Off — chat history is kept on this device.';
+    }
+
+    function togglePrivacyVault() {
+      const on = !kwPrivacyVaultOn();
+      try {
+        if (on) localStorage.setItem(KW_VAULT_KEY, '1');
+        else localStorage.removeItem(KW_VAULT_KEY);
+      } catch (e) {}
+      if (on) kwPurgeChatHistory();
+      applyVaultToggleUI();
+      showToast(on
+        ? 'Privacy Vault on — chat history cleared, and nothing new will be kept.'
+        : 'Privacy Vault off — chat history is kept on this device again.');
+    }
+
+    function openPrivacyVault() {
+      applyVaultToggleUI();
+      openModal('privacy-vault-modal');
+    }
+
+    /* ---------------- Shabbos Lists (REAL) ----------------
+       Pre-built checklists; ticks persist on this device only
+       (localStorage kw-shabbos-lists-v1). No prices — bundle pricing is a
+       later phase, and the panel says so. */
+    const KW_SHABBOS_KEY = 'kw-shabbos-lists-v1';
+    const SHABBOS_LISTS = [
+      { group: 'Paper Goods', items: ['Paper plates', 'Cups', 'Cutlery', 'Napkins', 'Paper towels', 'Tablecloths'] },
+      { group: 'Hosting', items: ['Challah', 'Wine & grape juice', 'Shabbos candles', 'Flowers', 'Soda & drinks', 'Dessert'] },
+      { group: 'Pantry Staples', items: ['Flour', 'Sugar', 'Oil', 'Eggs', 'Coffee & tea', 'Spices'] }
+    ];
+
+    function kwShabbosId(name) {
+      return name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function kwShabbosState() {
+      try {
+        const raw = localStorage.getItem(KW_SHABBOS_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+      } catch (e) { return {}; }
+    }
+
+    function kwShabbosSave(state) {
+      try { localStorage.setItem(KW_SHABBOS_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function renderShabbosLists() {
+      const body = document.getElementById('shabbos-lists-body');
+      if (!body) return;
+      const state = kwShabbosState();
+      body.innerHTML = '';
+      SHABBOS_LISTS.forEach(function (section) {
+        const done = section.items.filter(function (name) { return state[kwShabbosId(name)]; }).length;
+        const wrap = document.createElement('div');
+        wrap.className = 'mt-4 first:mt-0';
+        const head = document.createElement('div');
+        head.className = 'flex items-center justify-between';
+        const h = document.createElement('h4');
+        h.className = 'text-[11px] font-semibold uppercase tracking-wider text-inkSecondary';
+        h.textContent = section.group;
+        const count = document.createElement('span');
+        count.className = 'text-[11px] font-medium text-inkTertiary';
+        count.textContent = done + ' / ' + section.items.length;
+        head.appendChild(h);
+        head.appendChild(count);
+        wrap.appendChild(head);
+        const list = document.createElement('div');
+        list.className = 'mt-2 divide-y divide-gray-100 rounded-2xl border border-gray-100 overflow-hidden';
+        section.items.forEach(function (name) {
+          const id = kwShabbosId(name);
+          const label = document.createElement('label');
+          label.className = 'flex items-center gap-3 px-3.5 py-2.5 bg-white hover:bg-gray-50 cursor-pointer';
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.className = 'w-4.5 h-4.5 accent-[#1A73E8] cursor-pointer shrink-0';
+          input.setAttribute('data-shabbos-item', id);
+          input.checked = !!state[id];
+          input.addEventListener('change', function () { toggleShabbosItem(id, input.checked); });
+          const text = document.createElement('span');
+          text.className = 'text-sm text-inkPrimary' + (state[id] ? ' line-through opacity-50' : '');
+          text.textContent = name;
+          label.appendChild(input);
+          label.appendChild(text);
+          list.appendChild(label);
+        });
+        wrap.appendChild(list);
+        body.appendChild(wrap);
+      });
+    }
+
+    function toggleShabbosItem(id, checked) {
+      const state = kwShabbosState();
+      if (checked) state[id] = true; else delete state[id];
+      kwShabbosSave(state);
+      renderShabbosLists();
+    }
+
+    function clearShabbosLists() {
+      kwShabbosSave({});
+      renderShabbosLists();
+      showToast('Shabbos lists cleared — all ticks removed.');
+    }
+
+    function openShabbosLists() {
+      renderShabbosLists();
+      openModal('shabbos-lists-modal');
+    }
+
+    /* ---------------- Gemini status pill ----------------
+       Rendered only when a Gemini endpoint is actually configured
+       (KW_CHAT non-empty) — never as decoration while unconnected. */
+    function applyGeminiPill() {
+      const row = document.getElementById('gemini-pill-row');
+      if (!row) return;
+      if (typeof KW_CHAT !== 'undefined' && KW_CHAT) row.classList.remove('hidden');
+    }
+    document.addEventListener('DOMContentLoaded', applyGeminiPill);
   </script>
 
   <!-- ==================== KOSHER WEB TOOLS / PLUG-INS ====================
