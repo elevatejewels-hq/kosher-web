@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kosher web — Search, Calendar, Deals &amp; Rewards</title>
+  <!-- Load Inter Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brandBlue: '#1A73E8',
+            logoBlue: '#4285F4',
+            logoRed: '#EA4335',
+            logoYellow: '#FBBC05',
+            logoGreen: '#34A853',
+            inkPrimary: '#202124',
+            inkSecondary: '#5F6368',
+            surfaceSoft: '#F8F9FA',
+            hairline: '#E8EAED',
+          },
+          boxShadow: {
+            'pill': '0 1px 6px rgba(32, 33, 36, 0.08), 0 0 1px rgba(32, 33, 36, 0.12)',
+            'pill-hover': '0 4px 16px rgba(32, 33, 36, 0.14), 0 1px 3px rgba(32, 33, 36, 0.08)',
+            'elevation-1': '0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.06)',
+            'elevation-2': '0 4px 16px rgba(32, 33, 36, 0.12), 0 1px 4px rgba(32, 33, 36, 0.06)',
+            'launcher': '0 12px 32px rgba(32, 33, 36, 0.16), 0 2px 6px rgba(32, 33, 36, 0.08)',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Tactile Micro-interactions & Smooth View Transitions */
+    .tactile-btn {
+      transition: transform 0.16s cubic-bezier(0.2, 0, 0, 1), background-color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .tactile-btn:active {
+      transform: scale(0.97);
+    }
+    .app-view {
+      animation: viewFadeIn 0.24s cubic-bezier(0.2, 0, 0, 1);
+    }
+    @keyframes viewFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Custom Clean Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #DADCE0;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #BDC1C6;
+    }
+    /* --- Home Logo Bubbles Animation (5 seconds, pure HTML/CSS/JS — no video file) --- */
+    #logo-bubbles {
+      opacity: 0;
+      background:
+        radial-gradient(420px 260px at 18% 30%, rgba(234, 64, 251, 0.20), transparent 70%),
+        radial-gradient(460px 300px at 82% 24%, rgba(68, 138, 255, 0.20), transparent 70%),
+        radial-gradient(380px 260px at 55% 88%, rgba(124, 77, 255, 0.18), transparent 70%),
+        radial-gradient(300px 200px at 30% 85%, rgba(64, 196, 255, 0.16), transparent 70%);
+    }
+    #logo-bubbles.kw-bubbles-playing {
+      animation: kwBubbleWash 5s ease-in-out forwards;
+    }
+    @keyframes kwBubbleWash {
+      0% { opacity: 0; }
+      12% { opacity: 1; }
+      82% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .kw-bubble {
+      position: absolute;
+      display: block;
+      border-radius: 9999px;
+      box-shadow: inset -6px -8px 14px rgba(255, 255, 255, 0.25), inset 4px 6px 10px rgba(255, 255, 255, 0.55), 0 6px 18px rgba(124, 77, 255, 0.18);
+    }
+    .kw-drift-a { animation: kwDriftA 5s ease-in-out forwards; }
+    .kw-drift-b { animation: kwDriftB 5s ease-in-out forwards; }
+    .kw-drift-c { animation: kwDriftC 5s ease-in-out forwards; }
+    @keyframes kwDriftA {
+      0% { transform: translate(0, 14px) scale(0.7); }
+      35% { transform: translate(-16px, -18px) scale(1.05); }
+      70% { transform: translate(10px, -30px) scale(0.95); }
+      100% { transform: translate(-6px, -8px) scale(0.8); }
+    }
+    @keyframes kwDriftB {
+      0% { transform: translate(0, 10px) scale(0.75); }
+      40% { transform: translate(18px, -12px) scale(1.08); }
+      75% { transform: translate(-8px, -26px) scale(0.92); }
+      100% { transform: translate(8px, -6px) scale(0.82); }
+    }
+    @keyframes kwDriftC {
+      0% { transform: translate(0, 18px) scale(0.65); }
+      45% { transform: translate(-10px, -22px) scale(1.1); }
+      100% { transform: translate(12px, -12px) scale(0.85); }
+    }
+    /* --- Opening Splash (K logo brightens in; clears after ~2s, CSS fallback so it can never trap) --- */
+    #kw-splash {
+      animation: kwSplashHide 0.45s ease 2.35s forwards;
+    }
+    #kw-splash-logo {
+      animation: kwSplashBrighten 1.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+    }
+    @keyframes kwSplashBrighten {
+      0% { opacity: 0.1; filter: brightness(2.1) saturate(0.25); transform: scale(0.94); }
+      55% { opacity: 0.75; filter: brightness(1.35) saturate(0.7); transform: scale(0.99); }
+      100% { opacity: 1; filter: brightness(1) saturate(1); transform: scale(1); }
+    }
+    @keyframes kwSplashHide {
+      to { opacity: 0; visibility: hidden; }
+    }
+    /* --- Privacy Vault switch — plain CSS on purpose. The original build
+       sized the switch with Tailwind classes h-6.5 / w-5.5 / h-5.5, which
+       do not exist in Tailwind v3 (the CDN this page loads; its spacing
+       scale has 3.5 then whole numbers) — so no width/height CSS was ever
+       generated for them. The knob is absolutely positioned, so it gave
+       the button no intrinsic size: the switch collapsed to 44x0 with a
+       0x0 knob — invisible and unclickable in a real browser, even though
+       the button still worked from the keyboard. These rules depend on
+       nothing external; the on/off look follows aria-checked, which
+       applyVaultToggleUI() keeps in sync with the stored flag. */
+    .kw-vault-switch {
+      -webkit-appearance: none;
+      appearance: none;
+      display: inline-block;
+      position: relative;
+      flex-shrink: 0;
+      width: 44px;
+      height: 26px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-radius: 9999px;
+      background-color: #DADCE0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .kw-vault-switch[aria-checked="true"] {
+      background-color: #1A73E8;
+    }
+    .kw-vault-knob {
+      display: block;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background-color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(32, 33, 36, 0.35);
+      transition: transform 0.2s ease;
+      pointer-events: none;
+    }
+    .kw-vault-switch[aria-checked="true"] .kw-vault-knob {
+      transform: translateX(18px);
+    }
+  </style>
+</head>
+<body class="bg-white text-inkPrimary font-sans antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-brandBlue">
+
+  <!-- Opening Splash — only the kosher web K logo, brightening in; clears after ~2 seconds (click to skip) -->
+  <div id="kw-splash" onclick="dismissSplash()" class="fixed inset-0 z-[100] bg-white flex items-center justify-center cursor-pointer" aria-hidden="true">
+    <svg id="kw-splash-logo" class="w-28 h-28 sm:w-36 sm:h-36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web logo">
+      <rect x="22" y="12" width="22" height="96" fill="#4285F4" />
+      <polygon points="44,57 62,38 74,51 44,82" fill="#34A853" />
+      <polygon points="62,38 87,12 110,12 74,51" fill="#EA4335" />
+      <polygon points="59,67 74,51 110,108 87,108" fill="#FBBC05" />
+    </svg>
+  </div>
+
+  <!-- Persistent Top Utility & App Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-hairline">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+
+      <!-- Left: Compact Brand Mark + Live Weather Pill + Hebrew Date Pill -->
+      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <!-- Brand Logo (Returns to spacious Home Search Hub) -->
+        <button onclick="switchAppView('home')" class="tactile-btn flex items-center gap-2.5 py-1.5 px-2 rounded-full hover:bg-surfaceSoft focus:outline-none shrink-0" title="Return to kosher web Home">
+          <svg class="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web mark">
+            <rect x="14" y="10" width="20" height="80" fill="#4285F4" />
+            <polygon points="34,47 50,31 61,42 34,69" fill="#34A853" />
+            <polygon points="50,31 71,10 92,10 61,42" fill="#EA4335" />
+            <polygon points="48,55 61,42 92,90 71,90" fill="#FBBC05" />
+          </svg>
+          <span class="text-[19px] font-medium tracking-tight text-inkSecondary">kosher web</span>
+        </button>
+
+        <!-- Weather Status Pill -->
+        <button onclick="cycleWeatherLocation()" title="Switch city weather" class="tactile-btn hidden lg:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surfaceSoft hover:bg-gray-100 border border-hairline text-xs font-medium text-inkSecondary">
+          <span class="w-2 h-2 rounded-full bg-logoYellow"></span>
+          <span id="top-weather-label">Brooklyn, NY · 54°F Clear</span>
+        </button>
+
+        <!-- Hebrew & Gregorian Date Pill -->
+        <button onclick="switchAppView('calendar')" title="Open Jewish Calendar & Zmanim App" class="tactile-btn hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/70 hover:bg-blue-100/70 border border-blue-200/60 text-xs font-medium text-brandBlue truncate">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="4" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span class="truncate">9 Kislev 5787 · Thu, Nov 19</span>
+        </button>
+      </div>
+
+      <!-- Center: Clean Pill App Switcher (Desktop) -->
+      <nav aria-label="Primary App Navigation" class="hidden xl:flex items-center gap-1 bg-surfaceSoft p-1 rounded-full border border-hairline">
+        <button onclick="switchAppView('home')" data-nav="home" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-brandBlue shadow-xs">
+          Search
+        </button>
+        <button onclick="switchAppView('calendar')" data-nav="calendar" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-inkSecondary hover:text-inkPrimary">
+          Calendar &amp; Zmanim
+        </button>
+        <button onclick="switchAppView('cards')" data-nav="cards" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-inkSecondary hover:text-inkPrimary">
+          Credit Cards
+        </button>
+        <button onclick="switchAppView('deals')" data-nav="deals" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-inkSecondary hover:text-inkPrimary">
+          Deals &amp; Shopping
+        </button>
+        <button onclick="switchAppView('directory')" data-nav="directory" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-inkSecondary hover:text-inkPrimary">
+          Directory
+        </button>
+        <button onclick="switchAppView('rewards')" data-nav="rewards" class="nav-pill tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-inkSecondary hover:text-inkPrimary">
+          Cash Back
+        </button>
+      </nav>
+
+      <!-- Right: Rewards Badge + 9-Dot App Launcher + Sign In Pill -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- User Rewards Pill -->
+        <button onclick="switchAppView('rewards')" class="tactile-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surfaceSoft hover:bg-amber-50/70 border border-hairline text-xs font-semibold text-inkPrimary" title="Open Cash Back & Rewards Wallet">
+          <span class="w-2 h-2 rounded-full bg-logoYellow"></span>
+          <span id="header-points-label">1,250 pts · Tier: Gold</span>
+        </button>
+
+        <!-- Iconic 9-Dot App Launcher Button -->
+        <div class="relative">
+          <button id="launcher-trigger" onclick="toggleLauncher(event)" aria-label="Open kosher web Apps" title="kosher web Apps" class="tactile-btn w-10 h-10 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary hover:text-inkPrimary focus:outline-none">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="5" cy="5" r="2" />
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="19" cy="5" r="2" />
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+              <circle cx="5" cy="19" r="2" />
+              <circle cx="12" cy="19" r="2" />
+              <circle cx="19" cy="19" r="2" />
+            </svg>
+          </button>
+
+          <!-- Floating 9-Dot App Launcher Popover -->
+          <div id="launcher-menu" class="hidden absolute right-0 mt-2 w-80 sm:w-[340px] bg-white rounded-3xl shadow-launcher border border-hairline p-4 z-50">
+            <div class="flex items-center justify-between px-2 pb-3 border-b border-hairline">
+              <span class="text-xs font-semibold text-inkPrimary">kosher web Apps</span>
+              <span class="text-[11px] font-medium text-brandBlue">All Connected</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 pt-3">
+              <button onclick="launchApp('home')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-blue-50 text-logoBlue flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary">Fast Search</span>
+              </button>
+
+              <button onclick="launchApp('calendar')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-red-50 text-logoRed flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Jewish Calendar</span>
+              </button>
+
+              <button onclick="launchApp('cards')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-amber-50 text-logoYellow flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Credit Cards</span>
+              </button>
+
+              <button onclick="launchApp('deals')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-green-50 text-logoGreen flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Best Deals</span>
+              </button>
+
+              <button onclick="launchApp('directory')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-blue-50 text-logoBlue flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Directory</span>
+              </button>
+
+              <button onclick="launchApp('rewards')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-emerald-50 text-logoGreen flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Cash Back</span>
+              </button>
+
+              <button onclick="launchApp('calendar')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-amber-50 text-logoYellow flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Daily Zmanim</span>
+              </button>
+
+              <button onclick="launchApp('sponsor')" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-red-50 text-logoRed flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Sponsor Portal</span>
+              </button>
+
+              <button onclick="openAccountModal(); closeLauncher();" class="tactile-btn flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-surfaceSoft text-center">
+                <span class="w-11 h-11 rounded-2xl bg-gray-100 text-inkSecondary flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <span class="text-xs font-medium text-inkPrimary leading-tight">Member ID</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign In / Account Pill -->
+        <button id="header-signin-btn" onclick="openAccountModal()" class="tactile-btn px-4 py-2 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs sm:text-sm font-medium shadow-xs">
+          Sign In
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Compact App Strip -->
+    <div class="xl:hidden border-t border-hairline bg-surfaceSoft/60 px-4 py-2 overflow-x-auto flex items-center gap-1.5">
+      <button onclick="switchAppView('home')" data-nav="home" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium bg-white text-brandBlue shadow-xs">Search</button>
+      <button onclick="switchAppView('calendar')" data-nav="calendar" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium text-inkSecondary">Calendar &amp; Zmanim</button>
+      <button onclick="switchAppView('cards')" data-nav="cards" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium text-inkSecondary">Credit Cards</button>
+      <button onclick="switchAppView('deals')" data-nav="deals" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium text-inkSecondary">Deals &amp; Shopping</button>
+      <button onclick="switchAppView('directory')" data-nav="directory" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium text-inkSecondary">Directory</button>
+      <button onclick="switchAppView('rewards')" data-nav="rewards" class="nav-pill tactile-btn shrink-0 px-3 py-1 rounded-full text-xs font-medium text-inkSecondary">Cash Back</button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE (DEDICATED APP VIEWS) ==================== -->
+  <main class="flex-1">
+
+    <!-- VIEW 1: HOME SEARCH HUB (Iconic, Airy, Focused) -->
+    <section id="view-home" class="app-view max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-16">
+      <!-- Gemini status pill — shown ONLY when a Gemini endpoint is actually
+           configured (KW_CHAT non-empty); never decoration while unconnected. -->
+      <div id="gemini-pill-row" class="hidden flex justify-end -mt-4 sm:-mt-8 mb-4">
+        <span id="gemini-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E8F0FE] text-inkPrimary text-xs font-medium shadow-xs">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1A73E8" aria-hidden="true"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>
+          Gemini Flash API Connected
+        </span>
+      </div>
+
+
+      <!-- Centered Custom 4-Color "K" + "kosher web" Wordmark — click the logo: 5-second bubbles animation (logo stays in place, bubbles move) -->
+      <div id="home-hero" class="relative flex flex-col items-center text-center mb-8 select-none">
+        <div id="logo-bubbles" class="hidden pointer-events-none absolute -inset-x-4 sm:-inset-x-14 -top-6 -bottom-8" aria-hidden="true"></div>
+        <button id="home-logo-btn" onclick="playLogoAnimation()" title="Play the kosher web bubbles animation" aria-label="Play the kosher web bubbles animation" class="tactile-btn relative z-10 rounded-[2rem] focus:outline-none cursor-pointer">
+          <svg class="w-24 h-24 sm:w-28 sm:h-28 mb-2 block" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="kosher web logo">
+            <rect x="22" y="12" width="22" height="96" fill="#4285F4" />
+            <polygon points="44,57 62,38 74,51 44,82" fill="#34A853" />
+            <polygon points="62,38 87,12 110,12 74,51" fill="#EA4335" />
+            <polygon points="59,67 74,51 110,108 87,108" fill="#FBBC05" />
+          </svg>
+        </button>
+        <h1 class="relative z-10 text-4xl sm:text-[44px] font-normal tracking-tight text-inkSecondary leading-none">
+          kosher web
+        </h1>
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+        <button onclick="setHomeSearchScope('all')" data-scope="all" class="scope-chip tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-brandBlue border border-blue-200/80">
+          All
+        </button>
+        <button onclick="setHomeSearchScope('deals')" data-scope="deals" class="scope-chip tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100 border border-hairline">
+          Shopping &amp; Deals
+        </button>
+        <button onclick="setHomeSearchScope('cards')" data-scope="cards" class="scope-chip tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100 border border-hairline">
+          Credit Cards
+        </button>
+        <button onclick="setHomeSearchScope('directory')" data-scope="directory" class="scope-chip tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100 border border-hairline">
+          Directory &amp; Contacts
+        </button>
+        <button onclick="setHomeSearchScope('calendar')" data-scope="calendar" class="scope-chip tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100 border border-hairline">
+          Zmanim &amp; Calendar
+        </button>
+      </div>
+
+      <!-- Elevated Pill Search Bar -->
+      <div class="relative max-w-[680px] mx-auto">
+        <div class="flex items-center bg-white rounded-full border border-hairline shadow-pill hover:shadow-pill-hover focus-within:shadow-pill-hover focus-within:border-brandBlue/50 px-5 h-14 transition-all">
+          <svg class="w-5 h-5 text-inkSecondary shrink-0 mr-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            id="home-search-input"
+            type="text"
+            autocomplete="off"
+            oninput="handleHomeSearch(this.value)"
+            onfocus="openHomeAutocomplete()"
+            onkeydown="if(event.key==='Enter') executeHomeSearch()"
+            placeholder="Search products, credit card offers, zmanim, or verified contacts..."
+            class="w-full bg-transparent text-sm sm:text-[15px] text-inkPrimary placeholder-inkSecondary/70 focus:outline-none"
+          />
+          <button id="home-search-clear" onclick="clearHomeSearch()" class="hidden p-1.5 text-inkSecondary hover:text-inkPrimary rounded-full" title="Clear">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Instant Live Autocomplete Dropdown -->
+        <div id="home-autocomplete" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-3xl shadow-launcher border border-hairline overflow-hidden z-30">
+          <div class="px-5 py-2.5 bg-surfaceSoft border-b border-hairline flex items-center justify-between">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-inkSecondary">Instant Suggestions</span>
+            <span id="autocomplete-count" class="text-xs font-medium text-brandBlue">6 quick destinations</span>
+          </div>
+          <div id="autocomplete-items" class="divide-y divide-hairline max-h-72 overflow-y-auto">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Action Buttons Beneath Search Bar -->
+      <div class="flex items-center justify-center gap-3 mt-6">
+        <button onclick="executeHomeSearch()" class="tactile-btn px-5 py-2.5 rounded-full bg-surfaceSoft hover:bg-gray-100 border border-hairline text-xs sm:text-sm font-medium text-inkPrimary">
+          kosher web Search
+        </button>
+        <button onclick="triggerSmartMatch()" class="tactile-btn px-5 py-2.5 rounded-full bg-surfaceSoft hover:bg-blue-50/70 border border-hairline hover:border-blue-200 text-xs sm:text-sm font-medium text-brandBlue">
+          Smart Match Deal
+        </button>
+      </div>
+
+      <!-- Clean App Shortcuts Dock (6 Circular Icon Tiles) -->
+      <div class="mt-12 grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-2xl mx-auto">
+        <button onclick="switchAppView('calendar')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-blue-50 text-logoBlue flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Jewish Calendar</span>
+        </button>
+
+        <button onclick="switchAppView('deals')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-red-50 text-logoRed flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Best-Price Deals</span>
+        </button>
+
+        <button onclick="switchAppView('cards')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-amber-50 text-logoYellow flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Credit Card Hub</span>
+        </button>
+
+        <button onclick="switchAppView('directory')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-green-50 text-logoGreen flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Verified Directory</span>
+        </button>
+
+        <button onclick="switchAppView('rewards')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-emerald-50 text-logoGreen flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Cash Back Wallet</span>
+        </button>
+
+        <button onclick="switchAppView('sponsor')" class="tactile-btn group flex flex-col items-center gap-2.5 p-3 rounded-2xl hover:bg-surfaceSoft">
+          <div class="w-12 h-12 rounded-full bg-blue-50 text-logoBlue flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <span class="text-xs font-medium text-inkPrimary">Sponsor Spotlight</span>
+        </button>
+      </div>
+
+      <!-- Today's Specials — always 3 deal cards, auto-rotates every 2 seconds -->
+      <div class="mt-12 max-w-3xl mx-auto">
+        <div id="home-specials-box" class="rounded-3xl bg-surfaceSoft border border-hairline p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <h2 class="text-base sm:text-lg font-semibold text-inkPrimary">Today's Specials — Best Deals Across All Web Brands</h2>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-[11px] font-semibold shrink-0">
+              <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.2 12.4l2.5 2.5 5.1-5.4" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Todays Top Specials
+            </span>
+          </div>
+
+          <div id="home-specials-cards" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <!-- Populated dynamically: always exactly 3 deal cards -->
+          </div>
+
+          <div class="flex items-center justify-between gap-3 mt-5">
+            <button onclick="openAllSpecials()" class="tactile-btn px-4 py-2 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs font-semibold">
+              See all specials
+            </button>
+            <div class="flex items-center gap-1">
+              <button onclick="prevSpecial()" aria-label="Previous specials" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div id="home-specials-dots" class="flex items-center gap-1 px-1"></div>
+              <button onclick="nextSpecial()" aria-label="Next specials" class="tactile-btn w-8 h-8 rounded-full bg-white border border-hairline hover:bg-gray-100 flex items-center justify-center text-inkSecondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Grid — 18 kosher web apps in the owner's reference layout (3 rows of 6) -->
+      <style>
+        /* App grid 18 — the owner's reference layout: colourful flat circular
+           icons with a long-shadow look, recreated as inline SVG. */
+        .kw-apps18 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 8px; }
+        @media (min-width: 700px) { .kw-apps18 { grid-template-columns: repeat(6, 1fr); gap: 28px 10px; } }
+        .kw-app18-tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 4px 2px; background: none; border: none; cursor: pointer; font-family: inherit; }
+        .kw-app18-tile:focus-visible { outline: 2px solid #1A73E8; outline-offset: 3px; border-radius: 16px; }
+        .kw-app18-icon { display: block; transition: transform 0.18s ease; filter: drop-shadow(0 3px 5px rgba(60, 64, 67, 0.25)); }
+        .kw-app18-tile:hover .kw-app18-icon { transform: scale(1.06); }
+        .kw-app18-icon svg { display: block; width: 76px; height: 76px; }
+        @media (min-width: 700px) { .kw-app18-icon svg { width: 88px; height: 88px; } }
+        .kw-app18-label { font-size: 13.5px; font-weight: 500; color: #202124; text-align: center; line-height: 1.25; }
+        .kw-app18-badge { position: absolute; top: -2px; right: 0; background: #FFFFFF; border: 1px solid #E0E0E0; color: #202124; font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(60, 64, 67, 0.25); }
+      </style>
+      <div class="mt-14 max-w-4xl mx-auto">
+        <div class="flex items-center justify-between px-1 mb-4">
+          <h2 class="text-[11px] font-semibold uppercase tracking-wider text-inkSecondary">kosher web Apps</h2>
+          <span class="text-[11px] font-medium text-brandBlue">Tap an app to open it</span>
+        </div>
+        <div id="home-app-grid" class="kw-apps18">
+          <button type="button" data-app-tile="price-compare" onclick="openFastSearchApp()" class="kw-app18-tile" title="Price Compare">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC01"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC01)"><circle cx="53" cy="53" r="17" fill="rgba(0,0,0,0.13)"/><line x1="64" y1="64" x2="86" y2="86" stroke="rgba(0,0,0,0.13)" stroke-width="13" stroke-linecap="round"/><line x1="58" y1="58" x2="72" y2="72" stroke="#37474F" stroke-width="8" stroke-linecap="round"/><circle cx="40" cy="40" r="16" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><circle cx="40" cy="40" r="19.5" fill="none" stroke="#ECEFF1" stroke-width="5"/><text x="40" y="47" text-anchor="middle" font-size="19" font-weight="700" fill="#263238">$</text></g></svg></span>
+            <span class="kw-app18-label">Price Compare</span>
+          </button>
+          <button type="button" data-app-tile="price-history" onclick="openFeatureInfo('price-history')" class="kw-app18-tile" title="Price History">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC02"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC02)"><rect x="24" y="58" width="9" height="10" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="36" y="50" width="9" height="18" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="48" y="42" width="9" height="26" fill="#4285F4" stroke="#263238" stroke-width="2"/><rect x="60" y="34" width="9" height="34" fill="#4285F4" stroke="#263238" stroke-width="2"/><polyline points="39,43 53,57 63,49 79,67" stroke="rgba(0,0,0,0.13)" stroke-width="10" fill="none"/><polyline points="26,30 40,44 50,36 66,54" stroke="#FBBC05" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="57,50 68,55 63,44" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Price History</span>
+          </button>
+          <button type="button" data-app-tile="drop-alerts" onclick="openFeatureInfo('drop-alerts')" class="kw-app18-tile" title="Drop Alerts">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC03"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC03)"><path d="M58 38 a13 13 0 0 1 13 13 c0 8 2 11 4 13 H51 c2-2 4-5 4-13 a13 13 0 0 1 3-13 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 26 a13 13 0 0 1 13 13 c0 8 2 11 4 13 H31 c2-2 4-5 4-13 a13 13 0 0 1 13-13 Z" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><circle cx="48" cy="23" r="3.5" fill="#FBBC05" stroke="#263238" stroke-width="2"/><circle cx="48" cy="58" r="4" fill="#F9A825" stroke="#263238" stroke-width="2"/><g transform="rotate(18 66 30)"><rect x="58" y="20" width="17" height="22" rx="3" fill="#4285F4" stroke="#263238" stroke-width="2"/><circle cx="66.5" cy="27" r="2.6" fill="#FFFFFF"/></g></g></svg></span>
+            <span class="kw-app18-label">Drop Alerts</span>
+          </button>
+          <button type="button" data-app-tile="promo-coupons" onclick="openFeatureInfo('promo-coupons')" class="kw-app18-tile" title="Promo Coupons">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC04"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EF6C00"/><g clip-path="url(#kwC04)"><rect x="30" y="44" width="58" height="30" rx="5" fill="rgba(0,0,0,0.13)"/><rect x="19" y="33" width="58" height="30" rx="5" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><line x1="35" y1="37" x2="35" y2="59" stroke="#263238" stroke-width="2" stroke-dasharray="3 3"/><text x="57" y="56" text-anchor="middle" font-size="24" font-weight="700" fill="#263238">%</text></g></svg></span>
+            <span class="kw-app18-label">Promo Coupons</span>
+          </button>
+          <button type="button" data-app-tile="visual-search" onclick="openVisualSearchApp()" class="kw-app18-tile" title="Visual Search">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC05"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC05)"><rect x="38" y="46" width="42" height="29" rx="6" fill="rgba(0,0,0,0.13)"/><path d="M18 30 V22 a4 4 0 0 1 4-4 h8 M66 18 h8 a4 4 0 0 1 4 4 v8 M78 66 v8 a4 4 0 0 1 -4 4 h-8 M30 78 h-8 a4 4 0 0 1 -4-4 v-8" stroke="#263238" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="40" y="29" width="16" height="7" rx="3" fill="#37474F" stroke="#263238" stroke-width="2"/><rect x="27" y="35" width="42" height="29" rx="6" fill="#37474F" stroke="#263238" stroke-width="2"/><circle cx="48" cy="49.5" r="9" fill="#FFFFFF"/><circle cx="48" cy="49.5" r="5.5" fill="#4285F4" stroke="#263238" stroke-width="1.5"/><circle cx="63" cy="41" r="2" fill="#FBBC05"/></g></svg></span>
+            <span class="kw-app18-label">Visual Search</span>
+          </button>
+          <button type="button" data-app-tile="universal-cart" onclick="openFeatureInfo('universal-cart')" class="kw-app18-tile" title="Universal Cart">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC06"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EA4335"/><g clip-path="url(#kwC06)"><path d="M34 34 h22 l-3 12 h-17 Z" fill="rgba(0,0,0,0.13)"/><path d="M64 32 h22 l-3 12 h-17 Z" fill="rgba(0,0,0,0.13)"/><path d="M42 60 h24 l-3 13 h-18 Z" fill="rgba(0,0,0,0.13)"/><path d="M26 26 h22 l-3 12 h-17 Z" fill="#4285F4" stroke="#263238" stroke-width="2"/><circle cx="31" cy="43" r="2.6" fill="#263238"/><circle cx="43" cy="43" r="2.6" fill="#263238"/><path d="M56 24 h22 l-3 12 h-17 Z" fill="#34A853" stroke="#263238" stroke-width="2"/><circle cx="61" cy="41" r="2.6" fill="#263238"/><circle cx="73" cy="41" r="2.6" fill="#263238"/><path d="M34 52 h24 l-3 13 h-18 Z" fill="#FBBC05" stroke="#263238" stroke-width="2"/><circle cx="39" cy="70" r="2.6" fill="#263238"/><circle cx="52" cy="70" r="2.6" fill="#263238"/></g></svg></span>
+            <span class="kw-app18-label">Universal Cart</span>
+          </button>
+          <button type="button" data-app-tile="card-maximizer" onclick="openFeatureInfo('card-maximizer')" class="kw-app18-tile" title="Card Maximizer">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC07"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC07)"><rect x="39" y="54" width="40" height="26" fill="rgba(0,0,0,0.13)"/><polygon points="34,13 35.4,16.6 39.2,16.8 36.2,19.1 37.2,22.8 34,20.7 30.8,22.8 31.8,19.1 28.8,16.8 32.6,16.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><polygon points="48,10 49.4,13.6 53.2,13.8 50.2,16.1 51.2,19.8 48,17.7 44.8,19.8 45.8,16.1 42.8,13.8 46.6,13.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><polygon points="62,13 63.4,16.6 67.2,16.8 64.2,19.1 65.2,22.8 62,20.7 58.8,22.8 59.8,19.1 56.8,16.8 60.6,16.6" fill="#FFF8E1" stroke="#263238" stroke-width="1"/><rect x="25" y="33" width="46" height="10" fill="#EA4335" stroke="#263238" stroke-width="2"/><rect x="33" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="45" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="57" y="33" width="6" height="10" fill="#FFFFFF" opacity="0.9"/><rect x="28" y="43" width="40" height="26" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="33" y="52" width="10" height="17" fill="#4285F4" stroke="#263238" stroke-width="1.5"/><rect x="48" y="52" width="14" height="11" fill="#A8C7FA" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Card Maximizer</span>
+          </button>
+          <button type="button" data-app-tile="cashback-live" onclick="openFeatureInfo('cashback-live')" class="kw-app18-tile" title="Cashback Live">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC08"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC08)"><ellipse cx="57" cy="63" rx="19" ry="14.5" fill="rgba(0,0,0,0.13)"/><path d="M40 22 q14 -8 24 2" stroke="#FBBC05" stroke-width="5" fill="none" stroke-linecap="round"/><polygon points="59,17 70,24 58.5,28.5" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/><ellipse cx="46" cy="52" rx="19" ry="14.5" fill="#F48FB1" stroke="#263238" stroke-width="2.5"/><circle cx="62" cy="48" r="9" fill="#F48FB1" stroke="#263238" stroke-width="2.5"/><ellipse cx="68" cy="49" rx="4" ry="5" fill="#F8BBD0" stroke="#263238" stroke-width="1.5"/><polygon points="52,36 58,32 59,40" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><circle cx="60" cy="46" r="1.6" fill="#263238"/><rect x="34" y="64" width="5" height="6" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><rect x="52" y="64" width="5" height="6" fill="#F48FB1" stroke="#263238" stroke-width="1.5"/><path d="M27 48 q-6 -4 -3 -9" stroke="#263238" stroke-width="2" fill="none" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Cashback Live</span>
+          </button>
+          <button type="button" data-app-tile="daily-points" onclick="openFeatureInfo('daily-points')" class="kw-app18-tile" title="Daily Points">
+            <span class="kw-app18-badge">+1,300 pts</span><span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC09"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC09)"><rect x="39" y="55" width="38" height="26" fill="rgba(0,0,0,0.13)"/><ellipse cx="41" cy="30" rx="6" ry="4" fill="#EA4335" stroke="#263238" stroke-width="1.5"/><ellipse cx="53" cy="30" rx="6" ry="4" fill="#EA4335" stroke="#263238" stroke-width="1.5"/><rect x="28" y="44" width="38" height="26" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><rect x="25" y="35" width="44" height="10" fill="#EA4335" stroke="#263238" stroke-width="2.5"/><rect x="43" y="35" width="8" height="35" fill="#EA4335"/><circle cx="66" cy="66" r="11" fill="#4285F4" stroke="#263238" stroke-width="2"/><polygon points="66,59.5 67.9,64 72.5,64.3 68.9,67.2 70,71.7 66,69.2 62,71.7 63.1,67.2 59.5,64.3 64.1,64" fill="#FBBC05"/></g></svg></span>
+            <span class="kw-app18-label">Daily Points</span>
+          </button>
+          <button type="button" data-app-tile="zmanim-shabbos" onclick="switchAppView('calendar')" class="kw-app18-tile" title="Zmanim &amp; Shabbos">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC10"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#283593"/><g clip-path="url(#kwC10)"><rect x="38" y="54" width="7" height="22" fill="rgba(0,0,0,0.18)"/><rect x="30" y="44" width="7" height="22" fill="#FFF3E0" stroke="#263238" stroke-width="1.5"/><rect x="41" y="44" width="7" height="22" fill="#FFF3E0" stroke="#263238" stroke-width="1.5"/><path d="M33.5 27 c3 4 3 7 0 9 c-3 -2 -3 -5 0 -9 Z" fill="#FF9800" stroke="#E65100" stroke-width="1"/><path d="M44.5 27 c3 4 3 7 0 9 c-3 -2 -3 -5 0 -9 Z" fill="#FF9800" stroke="#E65100" stroke-width="1"/><rect x="27" y="66" width="13" height="4" fill="#FBBC05" stroke="#263238" stroke-width="1"/><rect x="38" y="66" width="13" height="4" fill="#FBBC05" stroke="#263238" stroke-width="1"/><polygon points="62,18 63.6,22.4 68,24 63.6,25.6 62,30 60.4,25.6 56,24 60.4,22.4" fill="#FBBC05"/><polygon points="76,26 77.2,29.8 81,31 77.2,32.2 76,36 74.8,32.2 71,31 74.8,29.8" fill="#FBBC05"/><circle cx="66" cy="56" r="13" fill="#FFFFFF" stroke="#FBBC05" stroke-width="3"/><line x1="66" y1="56" x2="66" y2="47" stroke="#263238" stroke-width="2" stroke-linecap="round"/><line x1="66" y1="56" x2="71" y2="59" stroke="#263238" stroke-width="2" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Zmanim &amp; Shabbos</span>
+          </button>
+          <button type="button" data-app-tile="kosher-directory" onclick="switchAppView('directory')" class="kw-app18-tile" title="Kosher Directory">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC11"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#34A853"/><g clip-path="url(#kwC11)"><polygon points="24,38 40,32 56,38 72,32 72,62 56,68 40,62 24,68" fill="#A8C7FA" stroke="#263238" stroke-width="2"/><polygon points="56,38 72,32 72,47 56,52" fill="#66BB6A" opacity="0.85"/><line x1="40" y1="32" x2="40" y2="62" stroke="#263238" stroke-width="1.5" opacity="0.45"/><line x1="56" y1="38" x2="56" y2="68" stroke="#263238" stroke-width="1.5" opacity="0.45"/><polyline points="24,56 44,50 72,44" stroke="#FBBC05" stroke-width="3.5" fill="none"/><path d="M57 28 a11 11 0 0 1 11 11 c0 8 -11 19 -11 19 s-11 -11 -11 -19 a11 11 0 0 1 11 -11 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 18 a11 11 0 0 1 11 11 c0 8 -11 19 -11 19 s-11 -11 -11 -19 a11 11 0 0 1 11 -11 Z" fill="#EA4335" stroke="#263238" stroke-width="2"/><circle cx="48" cy="29" r="4.5" fill="#FFFFFF"/></g></svg></span>
+            <span class="kw-app18-label">Kosher Directory</span>
+          </button>
+          <button type="button" data-app-tile="concierge" onclick="switchAppView('chat')" class="kw-app18-tile" title="Concierge">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC12"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC12)"><rect x="40" y="56" width="38" height="25" fill="rgba(0,0,0,0.13)"/><rect x="30" y="22" width="36" height="10" rx="2" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><text x="48" y="29.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="#263238" letter-spacing="0.5">BOUTIQUE</text><rect x="26" y="36" width="44" height="9" fill="#EA4335" stroke="#263238" stroke-width="2"/><rect x="34" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="45.5" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="57" y="36" width="5.5" height="9" fill="#FFFFFF" opacity="0.9"/><rect x="29" y="45" width="38" height="25" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="33" y="51" width="15" height="13" fill="#A8C7FA" stroke="#263238" stroke-width="1.5"/><line x1="36" y1="61" x2="43" y2="54" stroke="#FFFFFF" stroke-width="1.8"/><rect x="54" y="51" width="10" height="19" fill="#4285F4" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Concierge</span>
+          </button>
+          <button type="button" data-app-tile="shabbos-lists" onclick="openShabbosLists()" class="kw-app18-tile" title="Shabbos Lists">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC13"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#EF6C00"/><g clip-path="url(#kwC13)"><rect x="40" y="31" width="38" height="56" rx="5" fill="rgba(0,0,0,0.13)"/><rect x="29" y="20" width="38" height="56" rx="5" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><rect x="40" y="14" width="16" height="10" rx="3" fill="#90A4AE" stroke="#263238" stroke-width="2"/><circle cx="48" cy="19" r="2" fill="#FFFFFF"/><polyline points="37,38 40,41 45,35" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="38" x2="61" y2="38" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/><polyline points="37,50 40,53 45,47" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="50" x2="61" y2="50" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/><polyline points="37,62 40,65 45,59" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="49" y1="62" x2="61" y2="62" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/></g></svg></span>
+            <span class="kw-app18-label">Shabbos Lists</span>
+          </button>
+          <button type="button" data-app-tile="image-shield" onclick="openFeatureInfo('image-shield')" class="kw-app18-tile" title="Image Shield">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC14"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#283593"/><g clip-path="url(#kwC14)"><path d="M57 26 L83 35 V58 c0 17 -11 27 -26 33 c-8 -3.2 -14.7 -7.7 -19.4 -13.6 C41.9 83.6 49 88.4 57 91 Z" fill="rgba(0,0,0,0.18)"/><path d="M48 16 L74 25 V48 c0 17 -11 27 -26 33 c-15 -6 -26 -16 -26 -33 V25 Z" fill="#4285F4" stroke="#1A237E" stroke-width="2"/><path d="M48 16 L74 25 V48 c0 17 -11 27 -26 33 Z" fill="#3367D6"/><ellipse cx="48" cy="46" rx="13" ry="9" fill="#FFFFFF"/><circle cx="48" cy="46" r="5.5" fill="#1A73E8"/><circle cx="48" cy="46" r="2.6" fill="#202124"/><circle cx="50" cy="43.5" r="1.3" fill="#FFFFFF"/></g></svg></span>
+            <span class="kw-app18-label">Image Shield</span>
+          </button>
+          <button type="button" data-app-tile="clean-reader" onclick="openFeatureInfo('clean-reader')" class="kw-app18-tile" title="Clean Reader">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC15"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#FBBC05"/><g clip-path="url(#kwC15)"><path d="M58 40 C49 33 38 32 29 35 V80 c9 -3 20 -2 29 4 c9 -6 20 -7 29 -4 V35 C78 32 67 33 58 40 Z" fill="rgba(0,0,0,0.13)"/><path d="M48 29 C39 22 28 21 19 24 V69 c9 -3 20 -2 29 4 c9 -6 20 -7 29 -4 V24 C68 21 57 22 48 29 Z" fill="#1A73E8"/><path d="M48 32 C40 26 30 25 22 27 V66 c8 -2 18 -1 26 5 c8 -6 18 -7 26 -5 V27 C66 25 56 26 48 32 Z" fill="#FFFFFF"/><line x1="48" y1="32" x2="48" y2="71" stroke="#BDBDBD" stroke-width="1.5"/><rect x="28" y="42" width="15" height="11" rx="5" fill="#263238"/><rect x="53" y="42" width="15" height="11" rx="5" fill="#263238"/><path d="M43 45 q5 -3 10 0" stroke="#263238" stroke-width="2.5" fill="none"/></g></svg></span>
+            <span class="kw-app18-label">Clean Reader</span>
+          </button>
+          <button type="button" data-app-tile="gmail-calendar" onclick="openFeatureInfo('gmail-calendar')" class="kw-app18-tile" title="Gmail &amp; Calendar">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC16"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC16)"><rect x="31" y="41" width="46" height="34" rx="4" fill="rgba(0,0,0,0.13)"/><rect x="20" y="30" width="46" height="34" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2.5"/><path d="M22 33 L43 50 L64 33" stroke="#EA4335" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="52" width="26" height="24" rx="3" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><path d="M52 55 a3 3 0 0 1 3 -3 h20 a3 3 0 0 1 3 3 v4 H52 Z" fill="#EA4335"/><rect x="56" y="62" width="5" height="5" fill="#4285F4"/><rect x="64" y="62" width="5" height="5" fill="#4285F4"/><rect x="56" y="69" width="5" height="5" fill="#4285F4"/><rect x="64" y="69" width="5" height="5" fill="#4285F4"/></g></svg></span>
+            <span class="kw-app18-label">Gmail &amp; Calendar</span>
+          </button>
+          <button type="button" data-app-tile="privacy-vault" onclick="openPrivacyVault()" class="kw-app18-tile" title="Privacy Vault">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC17"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#4285F4"/><g clip-path="url(#kwC17)"><ellipse cx="58" cy="52" rx="24" ry="5.5" fill="rgba(0,0,0,0.13)"/><path d="M32 40 a16 9 0 0 1 32 0 Z" fill="#37474F" stroke="#263238" stroke-width="2"/><ellipse cx="48" cy="41" rx="24" ry="5.5" fill="#263238"/><rect x="29" y="48" width="15" height="10" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><rect x="52" y="48" width="15" height="10" rx="4" fill="#FFFFFF" stroke="#263238" stroke-width="2"/><line x1="44" y1="51" x2="52" y2="51" stroke="#263238" stroke-width="2"/><rect x="33" y="62" width="30" height="17" rx="3" fill="#ECEFF1" stroke="#263238" stroke-width="2"/><path d="M45.5 68 v-2.5 a2.5 2.5 0 0 1 5 0 V68" stroke="#263238" stroke-width="1.5" fill="none"/><rect x="43" y="68" width="10" height="8" rx="2" fill="#FBBC05" stroke="#263238" stroke-width="1.5"/></g></svg></span>
+            <span class="kw-app18-label">Privacy Vault</span>
+          </button>
+          <button type="button" data-app-tile="price-match" onclick="openFeatureInfo('price-match')" class="kw-app18-tile" title="Price Match">
+            <span class="kw-app18-icon"><svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="kwC18"><circle cx="48" cy="48" r="48"/></clipPath></defs><circle cx="48" cy="48" r="48" fill="#E65100"/><g clip-path="url(#kwC18)"><polygon points="38,40 78,72 70,80 30,48" fill="rgba(0,0,0,0.13)"/><g transform="rotate(-35 48 44)"><rect x="28" y="30" width="34" height="13" rx="3" fill="#FBBC05" stroke="#263238" stroke-width="2.5"/><rect x="33" y="30" width="5" height="13" fill="#795548"/><rect x="52" y="30" width="5" height="13" fill="#795548"/><rect x="42" y="43" width="6" height="24" rx="3" fill="#795548" stroke="#263238" stroke-width="2"/></g><rect x="30" y="72" width="30" height="5" rx="2" fill="#795548" stroke="#263238" stroke-width="2"/><rect x="26" y="79" width="38" height="4" rx="2" fill="#5D4037"/></g></svg></span>
+            <span class="kw-app18-label">Price Match</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: JEWISH CALENDAR & ZMANIM DEDICATED APP -->
+    <section id="view-calendar" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-hairline">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-logoBlue">kosher web Calendar App</span>
+          <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Jewish Calendar &amp; Daily Zmanim</h2>
+        </div>
+        <div class="flex items-center gap-2.5 bg-surfaceSoft px-3.5 py-2 rounded-full border border-hairline">
+          <span class="text-xs font-medium text-inkSecondary">Location:</span>
+          <select id="zmanim-city-picker" onchange="changeZmanimLocation(this.value)" class="bg-white text-xs font-semibold text-inkPrimary px-3 py-1 rounded-full border border-hairline focus:outline-none focus:border-brandBlue">
+            <option value="brooklyn">Brooklyn, NY</option>
+            <option value="lakewood">Lakewood, NJ</option>
+            <option value="monsey">Monsey, NY</option>
+            <option value="jerusalem">Jerusalem, Israel</option>
+            <option value="london">London, UK</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left (7 cols): Interactive Monthly Hebrew/Gregorian Calendar Grid -->
+        <div class="lg:col-span-7 bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div>
+              <h3 class="text-lg font-semibold text-inkPrimary">Kislev 5787 · November 2026</h3>
+              <p class="text-xs text-inkSecondary">Select any date to view Parsha, Rosh Chodesh &amp; daily Halachic schedule</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-blue-50 text-brandBlue text-xs font-semibold">
+              Parashat Vayetzei
+            </span>
+          </div>
+
+          <!-- Day Headers -->
+          <div class="grid grid-cols-7 gap-1.5 text-center text-[11px] font-semibold uppercase text-inkSecondary mb-2">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div class="text-brandBlue">Shabbat</div>
+          </div>
+
+          <!-- Monthly Grid -->
+          <div id="monthly-calendar-grid" class="grid grid-cols-7 gap-1.5">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Selected Date Detail Strip -->
+          <div id="calendar-day-inspector" class="mt-5 p-4 rounded-2xl bg-surfaceSoft border border-hairline flex flex-wrap items-center justify-between gap-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right (5 cols): Live Daily Zmanim & Halachic Times Card -->
+        <div class="lg:col-span-5 bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-semibold text-inkPrimary">Daily Zmanim</h3>
+                <p id="zmanim-subtitle" class="text-xs text-inkSecondary">Brooklyn, NY · Thursday, 9 Kislev</p>
+              </div>
+              <button onclick="copyZmanimSchedule()" class="tactile-btn px-3.5 py-1.5 rounded-full bg-surfaceSoft hover:bg-gray-100 border border-hairline text-xs font-semibold text-brandBlue">
+                Copy Times
+              </button>
+            </div>
+
+            <div id="zmanim-times-list" class="divide-y divide-hairline">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-brandBlue">Upcoming Holiday</p>
+              <p class="text-sm font-bold text-inkPrimary">Chanukah · 1st Candle</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-white text-xs font-semibold text-brandBlue border border-blue-100">
+              25 Kislev · 16 Days
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: CREDIT CARD OFFERS & REWARDS COMPARISON APP -->
+    <section id="view-cards" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-hairline">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-amber-700">kosher web Card Hub</span>
+          <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Credit Card Offers &amp; Rewards Explorer</h2>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="filterCreditCards('all')" data-cardcat="all" class="card-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brandBlue text-white">All Cards</button>
+          <button onclick="filterCreditCards('nofee')" data-cardcat="nofee" class="card-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">No Annual Fee</button>
+          <button onclick="filterCreditCards('cashback')" data-cardcat="cashback" class="card-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Cash Back</button>
+          <button onclick="filterCreditCards('travel')" data-cardcat="travel" class="card-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Travel &amp; Points</button>
+          <button onclick="filterCreditCards('business')" data-cardcat="business" class="card-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Business</button>
+        </div>
+      </div>
+
+      <!-- Interactive Rewards Calculator Slider Bar -->
+      <div class="bg-surfaceSoft rounded-3xl border border-hairline p-6 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="space-y-1 max-w-md">
+          <span class="text-xs font-semibold uppercase tracking-wider text-brandBlue">Interactive Rewards Estimator</span>
+          <h3 class="text-lg font-semibold text-inkPrimary">Estimate Your Annual Cash Back</h3>
+          <p class="text-xs text-inkSecondary">Drag the slider to match your monthly household or business card spend.</p>
+        </div>
+
+        <div class="flex-1 w-full max-w-md space-y-2">
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-inkSecondary">Monthly Spend:</span>
+            <span id="monthly-spend-label" class="text-brandBlue text-sm">$3,500 / mo</span>
+          </div>
+          <input
+            type="range"
+            min="500"
+            max="15000"
+            step="250"
+            value="3500"
+            oninput="updateSpendCalculator(this.value)"
+            class="w-full accent-brandBlue cursor-pointer"
+          />
+          <div class="flex justify-between text-[11px] text-inkSecondary">
+            <span>$500/mo</span>
+            <span>$7,500/mo</span>
+            <span>$15,000/mo</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-hairline px-5 py-3.5 text-center shrink-0 w-full md:w-auto">
+          <p class="text-[11px] text-inkSecondary">Est. First-Year Value</p>
+          <p id="estimated-annual-reward" class="text-2xl font-bold text-logoGreen">$1,090</p>
+        </div>
+      </div>
+
+      <!-- Cards Comparison Grid -->
+      <div id="cards-app-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Side-by-Side Comparison Drawer -->
+      <div id="card-compare-drawer" class="hidden mt-8 bg-white rounded-3xl border border-brandBlue/30 shadow-elevation-2 p-6">
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-hairline">
+          <h3 class="text-base font-semibold text-inkPrimary">Side-by-Side Card Comparison</h3>
+          <button onclick="clearCardComparison()" class="text-xs font-semibold text-brandBlue hover:underline">Clear Comparison</button>
+        </div>
+        <div id="card-compare-content" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: BEST-PRICE DEALS & KOSHER SHOPPING APP -->
+    <section id="view-deals" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-hairline">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-logoRed">kosher web Shopping</span>
+          <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Best-Price Deals &amp; Verified Stores</h2>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="filterDealsCategory('all')" data-dealcat="all" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brandBlue text-white">All Deals</button>
+          <button onclick="filterDealsCategory('electronics')" data-dealcat="electronics" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Electronics</button>
+          <button onclick="filterDealsCategory('home')" data-dealcat="home" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Home &amp; Kitchen</button>
+          <button onclick="filterDealsCategory('judaica')" data-dealcat="judaica" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Judaica &amp; Silver</button>
+          <button onclick="filterDealsCategory('grocery')" data-dealcat="grocery" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Grocery &amp; Bulk</button>
+          <button onclick="filterDealsCategory('travel')" data-dealcat="travel" class="deal-cat-btn tactile-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-surfaceSoft text-inkSecondary hover:bg-gray-100">Travel</button>
+        </div>
+      </div>
+
+      <div id="deals-app-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW 5: VERIFIED DIRECTORY & CONTACTS APP -->
+    <section id="view-directory" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-hairline">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-logoGreen">kosher web Network</span>
+          <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Verified Directory &amp; Contacts</h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <input
+            id="directory-filter-input"
+            type="text"
+            oninput="renderDirectoryApp()"
+            placeholder="Filter by name, specialty, or city..."
+            class="px-4 py-2 rounded-full bg-surfaceSoft border border-hairline text-xs sm:text-sm focus:outline-none focus:border-brandBlue w-64"
+          />
+          <select id="directory-cat-select" onchange="renderDirectoryApp()" class="px-4 py-2 rounded-full bg-surfaceSoft border border-hairline text-xs sm:text-sm font-medium text-inkPrimary focus:outline-none focus:border-brandBlue">
+            <option value="all">All Categories</option>
+            <option value="Finance & Tax">Finance &amp; Tax</option>
+            <option value="Recruiting & Jobs">Recruiting &amp; Jobs</option>
+            <option value="Home & Contractors">Home &amp; Contractors</option>
+            <option value="Legal & Real Estate">Legal &amp; Real Estate</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="directory-app-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- All Stores — the full store directory (tap a store: its website opens; no website → store details) -->
+      <div class="mt-12">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-hairline">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-logoGreen">Cash Back Stores</span>
+            <h3 class="text-xl sm:text-2xl font-semibold text-inkPrimary mt-1">All Stores</h3>
+          </div>
+          <span id="store-count-label" class="text-xs font-medium text-inkSecondary">30 stores · 2% Cash Back</span>
+        </div>
+        <div id="directory-stores-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: CASH BACK & GAMIFICATION REWARDS HUB -->
+    <section id="view-rewards" class="app-view hidden max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="pb-6 mb-8 border-b border-hairline">
+        <span class="text-xs font-semibold uppercase tracking-wider text-logoGreen">Member Wallet &amp; Loyalty</span>
+        <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Cash Back &amp; Rewards Hub</h2>
+      </div>
+
+      <!-- Summary Metric Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        <div class="bg-surfaceSoft rounded-3xl border border-hairline p-6">
+          <p class="text-xs font-medium text-inkSecondary">Verified Cash Back Balance</p>
+          <p id="wallet-cashback-balance" class="text-3xl font-bold text-logoGreen mt-1">$84.50</p>
+          <button onclick="showToast('Payout request initiated to your linked account!')" class="tactile-btn mt-4 px-4 py-1.5 rounded-full bg-white border border-hairline text-xs font-semibold text-inkPrimary hover:bg-gray-100">
+            Redeem Balance
+          </button>
+        </div>
+
+        <div class="bg-surfaceSoft rounded-3xl border border-hairline p-6">
+          <p class="text-xs font-medium text-inkSecondary">Member Points &amp; Tier</p>
+          <p id="wallet-points-total" class="text-3xl font-bold text-brandBlue mt-1">1,250 pts</p>
+          <p id="wallet-tier-sub" class="text-xs text-inkSecondary mt-2">Gold Tier · 750 pts to Platinum</p>
+        </div>
+
+        <div class="bg-surfaceSoft rounded-3xl border border-hairline p-6">
+          <p class="text-xs font-medium text-inkSecondary">Active Check-In Streak</p>
+          <p class="text-3xl font-bold text-logoYellow mt-1">7 Days</p>
+          <button onclick="claimDailyStreak()" id="daily-streak-btn" class="tactile-btn mt-4 px-4 py-1.5 rounded-full bg-brandBlue text-white text-xs font-semibold hover:bg-blue-700">
+            Claim +50 Daily Pts
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Receipt & Service Claim Form + Badges -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-7 bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6">
+          <h3 class="text-lg font-semibold text-inkPrimary mb-1">Submit Purchase or Service for Cash Back</h3>
+          <p class="text-xs text-inkSecondary mb-5">Enter your order reference from any verified partner store to credit cash back and rank points.</p>
+
+          <form onsubmit="processRewardsClaim(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-inkPrimary mb-1.5">Partner Merchant</label>
+              <select id="rewards-merchant-select" class="w-full px-4 py-2.5 rounded-2xl bg-surfaceSoft border border-hairline text-sm font-medium focus:outline-none focus:border-brandBlue">
+                <option value="Elevate Jewels">Elevate Jewels (2% Cash Back)</option>
+                <option value="Infinite Lighting">Infinite Lighting (2% Cash Back)</option>
+                <option value="Crown Sterling Judaica">Crown Sterling Judaica (2.5% Cash Back)</option>
+                <option value="NexaTech Direct">NexaTech Direct (3% Cash Back)</option>
+                <option value="Verified Directory Specialist">Verified Directory Specialist (+250 Bonus Pts)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-inkPrimary mb-1.5">Order / Receipt Number</label>
+                <input id="rewards-order-input" type="text" required placeholder="e.g., KW-90412" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-inkPrimary mb-1.5">Total Amount ($)</label>
+                <input id="rewards-amount-input" type="number" step="0.01" min="1" required placeholder="250.00" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+              </div>
+            </div>
+            <button type="submit" class="tactile-btn px-6 py-2.5 rounded-full bg-logoGreen hover:bg-emerald-600 text-white text-sm font-semibold">
+              Verify Receipt &amp; Credit Wallet
+            </button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-5 bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6">
+          <h3 class="text-lg font-semibold text-inkPrimary mb-4">Unlocked Member Badges</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-surfaceSoft">
+              <span class="w-9 h-9 rounded-full bg-blue-50 text-logoBlue flex items-center justify-center font-bold text-xs">★</span>
+              <div>
+                <p class="text-xs font-semibold text-inkPrimary">Verified Shopper</p>
+                <p class="text-[11px] text-inkSecondary">Completed 3+ verified partner orders</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-surfaceSoft">
+              <span class="w-9 h-9 rounded-full bg-amber-50 text-logoYellow flex items-center justify-center font-bold text-xs">7d</span>
+              <div>
+                <p class="text-xs font-semibold text-inkPrimary">Weekly Zmanim &amp; Search Streak</p>
+                <p class="text-[11px] text-inkSecondary">7 consecutive days active on kosher web</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-surfaceSoft">
+              <span class="w-9 h-9 rounded-full bg-green-50 text-logoGreen flex items-center justify-center font-bold text-xs">2%</span>
+              <div>
+                <p class="text-xs font-semibold text-inkPrimary">Smart Deal Finder</p>
+                <p class="text-[11px] text-inkSecondary">Saved over $150 via Best-Price comparison</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: SPONSOR PORTAL & AD BOOKING APP -->
+    <section id="view-sponsor" class="app-view hidden max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="pb-6 mb-8 border-b border-hairline">
+        <span class="text-xs font-semibold uppercase tracking-wider text-logoRed">Business Growth</span>
+        <h2 class="text-2xl sm:text-3xl font-semibold text-inkPrimary mt-1">Sponsor Spotlight &amp; Live Ad Preview</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-6 bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6 space-y-4">
+          <h3 class="text-lg font-semibold text-inkPrimary">Customize Your Spotlight Banner</h3>
+          <p class="text-xs text-inkSecondary">Preview how your business appears on the kosher web Home Search Hub.</p>
+
+          <div>
+            <label class="block text-xs font-semibold text-inkPrimary mb-1">Business Name &amp; Headline</label>
+            <input id="preview-biz-title" type="text" oninput="updateSponsorLivePreview()" value="Your Brand — Exclusive Member Offer" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-inkPrimary mb-1">Offer Description</label>
+            <textarea id="preview-biz-desc" rows="2" oninput="updateSponsorLivePreview()" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue">Direct workshop pricing with fast nationwide shipping and instant member cash back.</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-inkPrimary mb-1">Cash Back Incentive</label>
+            <select id="preview-biz-rate" onchange="updateSponsorLivePreview()" class="w-full px-4 py-2.5 rounded-2xl bg-surfaceSoft border border-hairline text-sm font-medium focus:outline-none focus:border-brandBlue">
+              <option value="2% Cash Back + 150 Pts">2% Cash Back + 150 Bonus Pts</option>
+              <option value="3% Cash Back + 200 Pts">3% Cash Back + 200 Bonus Pts</option>
+              <option value="5% Cash Back + 300 Pts">5% Cash Back + 300 Bonus Pts</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col justify-between gap-6">
+          <!-- Live Preview Card -->
+          <div class="bg-surfaceSoft rounded-3xl border border-hairline p-6">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-inkSecondary mb-3">Live Home Hub Preview</p>
+            <div class="bg-white rounded-2xl border border-hairline p-5 shadow-elevation-1 space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-surfaceSoft border border-hairline text-[11px] font-semibold text-inkSecondary">Verified Sponsor</span>
+                <span id="live-preview-badge" class="px-2.5 py-0.5 rounded-full bg-green-50 text-logoGreen text-[11px] font-semibold">2% Cash Back + 150 Pts</span>
+              </div>
+              <h4 id="live-preview-title" class="text-base font-semibold text-inkPrimary">Your Brand — Exclusive Member Offer</h4>
+              <p id="live-preview-desc" class="text-xs text-inkSecondary leading-relaxed">Direct workshop pricing with fast nationwide shipping and instant member cash back.</p>
+              <div class="pt-2">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-brandBlue text-white text-xs font-semibold">Claim Offer</span>
+              </div>
+            </div>
+          </div>
+
+          <form onsubmit="submitSponsorBooking(event)" class="bg-white rounded-3xl border border-hairline p-6 space-y-3">
+            <h4 class="text-sm font-semibold text-inkPrimary">Reserve Placement</h4>
+            <input type="email" required placeholder="Work email address..." class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+            <button type="submit" class="tactile-btn w-full py-2.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-sm font-semibold">
+              Submit Sponsor Request
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: KOSHER CHAT — BUSINESS AI ASSISTANT (layout per owner's chat mock) -->
+    <section id="view-chat" class="app-view hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <style>
+        /* Waiting indicator: four bouncing dots in the brand colours
+           (blue, red, yellow, green — the owner's typing-dots image),
+           Google-style, shown while Kosher Chat waits for the back end. */
+        .kw-chat-typing { display: inline-flex; align-items: center; gap: 5px; padding: 3px 0; }
+        .kw-chat-dot { width: 8px; height: 8px; border-radius: 9999px; display: inline-block; animation: kwChatDotBounce 1.15s ease-in-out infinite; }
+        @keyframes kwChatDotBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+      </style>
+      <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 overflow-hidden flex h-[72vh] min-h-[540px]">
+
+        <!-- Dark Sidebar: Chat + Chat History -->
+        <aside class="hidden md:flex w-64 shrink-0 bg-[#202124] text-white flex-col">
+          <div class="flex items-center justify-between px-5 pt-5 pb-3">
+            <span class="text-lg font-medium">Chat</span>
+            <span class="text-white/40" aria-hidden="true">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+            </span>
+          </div>
+          <div class="px-3">
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-full bg-white/10 text-sm text-white/90">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <span>Chat history</span>
+            </div>
+          </div>
+          <div id="chat-history-list" class="px-3 mt-3 space-y-1 overflow-y-auto">
+            <p id="chat-history-empty" class="px-3 text-xs leading-relaxed text-white/40">No chats yet — your conversations will appear here.</p>
+          </div>
+          <div class="mt-auto p-3">
+            <button onclick="startNewChat()" class="tactile-btn w-full py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-sm font-medium text-white">+ New chat</button>
+          </div>
+        </aside>
+
+        <!-- Main Chat Column -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <!-- Chat Header: small mark + "kosher chat" -->
+          <div class="flex items-center justify-between px-5 sm:px-6 pt-5 pb-2">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
+                <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
+                <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
+              </svg>
+              <span class="text-xl font-normal text-inkSecondary">kosher chat</span>
+            </div>
+            <button onclick="startNewChat()" title="Start a new chat" class="tactile-btn md:hidden px-3.5 py-1.5 rounded-full bg-surfaceSoft border border-hairline text-xs font-medium text-inkSecondary">New chat</button>
+          </div>
+
+          <!-- Messages Area -->
+          <div id="chat-messages" class="flex-1 overflow-y-auto px-5 sm:px-8 py-4">
+            <!-- Centred greeting — shown until the first message is sent -->
+            <div id="chat-hero" class="h-full flex flex-col items-center justify-center text-center py-8">
+              <svg class="w-20 h-20 mb-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5" />
+                <path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round" />
+                <path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05" />
+                <path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335" />
+              </svg>
+              <h2 class="text-2xl sm:text-[28px] font-normal text-inkPrimary leading-snug">Hi, how can I help your business today?</h2>
+              <p id="chat-hero-sub" class="text-sm text-inkSecondary mt-3 max-w-md leading-relaxed">Kosher Chat is the kosher web assistant for business questions. It is being connected now — you can already start the conversation below.</p>
+            </div>
+            <div id="chat-thread" class="space-y-4"></div>
+          </div>
+
+          <!-- Adjust Search Parameters Toggle -->
+          <div class="px-5 sm:px-8">
+            <div class="flex items-center justify-end gap-2.5">
+              <span class="text-xs text-inkSecondary">Adjust search parameters</span>
+              <button id="chat-params-toggle" onclick="toggleChatParams()" role="switch" aria-checked="false" aria-label="Adjust search parameters" class="tactile-btn relative w-11 h-6 rounded-full bg-gray-300 shrink-0">
+                <span id="chat-params-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+              </button>
+            </div>
+            <div id="chat-params-panel" class="hidden mt-2.5 flex flex-wrap items-center justify-end gap-1.5">
+              <span class="text-[11px] text-inkSecondary mr-1">The assistant will search:</span>
+              <button onclick="setChatParamScope('all')" data-chat-scope="all" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-blue-50 text-brandBlue border border-blue-200/80">All of kosher web</button>
+              <button onclick="setChatParamScope('deals')" data-chat-scope="deals" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Deals</button>
+              <button onclick="setChatParamScope('directory')" data-chat-scope="directory" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Directory</button>
+              <button onclick="setChatParamScope('calendar')" data-chat-scope="calendar" class="chat-scope-chip tactile-btn px-3 py-1 rounded-full text-[11px] font-medium bg-surfaceSoft text-inkSecondary border border-hairline">Zmanim</button>
+            </div>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="px-4 sm:px-6 pb-5 pt-2.5">
+            <div class="flex items-center gap-1 bg-white rounded-full border border-hairline shadow-pill focus-within:shadow-pill-hover px-2 py-1.5">
+              <button onclick="showToast('Attachments arrive when Kosher Chat connects.')" aria-label="Attach a file" title="Attach" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button onclick="showToast('Photo search arrives when Kosher Chat connects.')" aria-label="Search by photo" title="Photo search" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <input
+                id="chat-input"
+                type="text"
+                autocomplete="off"
+                placeholder="Ask kosher chat..."
+                onkeydown="if(event.key==='Enter') sendChatMessage()"
+                class="flex-1 min-w-0 bg-transparent px-2 text-sm sm:text-[15px] text-inkPrimary placeholder-inkSecondary/70 focus:outline-none"
+              />
+              <button onclick="showToast('Voice input arrives when Kosher Chat connects.')" aria-label="Voice input" title="Voice input" class="tactile-btn w-9 h-9 rounded-full hover:bg-surfaceSoft flex items-center justify-center text-inkSecondary shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+              <button onclick="sendChatMessage()" aria-label="Send message" title="Send" class="tactile-btn w-10 h-10 rounded-full bg-brandBlue hover:bg-blue-700 text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <p id="chat-status-note" class="text-[11px] text-inkSecondary text-center mt-2.5">Kosher Chat is for business questions. The assistant is being connected — answers will appear here soon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Minimalist Clean Footer -->
+  <footer class="border-t border-hairline bg-surfaceSoft/60 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-inkSecondary">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-logoBlue"></span>
+        <span class="w-2 h-2 rounded-full bg-logoRed"></span>
+        <span class="w-2 h-2 rounded-full bg-logoYellow"></span>
+        <span class="w-2 h-2 rounded-full bg-logoGreen"></span>
+        <span class="ml-1 font-medium text-inkPrimary">kosher web</span>
+        <span>· Connected Search, Deals, Calendar &amp; Rewards</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <button onclick="switchAppView('home')" class="hover:text-inkPrimary">Search Hub</button>
+        <button onclick="switchAppView('calendar')" class="hover:text-inkPrimary">Calendar &amp; Zmanim</button>
+        <button onclick="switchAppView('cards')" class="hover:text-inkPrimary">Credit Cards</button>
+        <button onclick="switchAppView('chat')" class="hover:text-inkPrimary">Kosher Chat</button>
+        <button onclick="switchAppView('sponsor')" class="hover:text-brandBlue font-medium">Advertise</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODALS & TOAST ==================== -->
+
+  <!-- Quick Claim Deal / Cash Back Modal -->
+  <div id="claim-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-launcher border border-hairline">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline">
+        <h3 class="text-lg font-semibold text-inkPrimary">Activate Offer &amp; Cash Back</h3>
+        <button onclick="closeModal('claim-modal')" class="p-1.5 rounded-full hover:bg-surfaceSoft text-inkSecondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="py-5 space-y-4">
+        <div class="p-4 rounded-2xl bg-green-50/80 border border-green-200">
+          <p class="text-xs font-semibold text-logoGreen">Verified Cash Back Activated</p>
+          <p id="claim-modal-store" class="text-base font-bold text-inkPrimary mt-0.5">Elevate Jewels</p>
+          <p class="text-xs text-inkSecondary mt-1">Your session is tagged for automatic 2% cash back + 150 bonus points upon checkout.</p>
+        </div>
+        <button onclick="confirmOfferActivation()" class="tactile-btn w-full py-2.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-sm font-semibold">
+          Continue &amp; Collect +50 Activation Pts
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Specialist Modal -->
+  <div id="contact-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-launcher border border-hairline">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline">
+        <h3 id="contact-modal-name" class="text-lg font-semibold text-inkPrimary">Contact Specialist</h3>
+        <button onclick="closeModal('contact-modal')" class="p-1.5 rounded-full hover:bg-surfaceSoft text-inkSecondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form onsubmit="sendDirectContact(event)" class="py-4 space-y-3">
+        <p id="contact-modal-role" class="text-xs text-inkSecondary">Direct verified message</p>
+        <input type="text" required placeholder="Your Name" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+        <input type="tel" required placeholder="Phone or Email for Callback" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+        <textarea rows="2" required placeholder="How can they help you?" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue"></textarea>
+        <button type="submit" class="tactile-btn w-full py-2.5 rounded-full bg-brandBlue text-white text-sm font-semibold">
+          Send Verified Inquiry
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Store Details Modal (stores without a website open their details here) -->
+  <div id="store-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-launcher border border-hairline">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline">
+        <h3 id="store-modal-name" class="text-lg font-semibold text-inkPrimary">Store Details</h3>
+        <button onclick="closeModal('store-modal')" class="p-1.5 rounded-full hover:bg-surfaceSoft text-inkSecondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="py-4 space-y-2.5 text-sm text-inkPrimary">
+        <p><span class="text-inkSecondary">Category:</span> <span id="store-modal-category">—</span></p>
+        <p><span class="text-inkSecondary">Address:</span> <span id="store-modal-address">—</span></p>
+        <p><span class="text-inkSecondary">Phone:</span> <span id="store-modal-phone">—</span></p>
+        <p class="pt-1 text-xs font-semibold text-logoGreen">2% Cash Back at this store</p>
+        <p class="text-[11px] text-inkSecondary">This store has no website on file — call or visit in person.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- One-Click Account Sign In Modal -->
+  <div id="account-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-launcher border border-hairline">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline">
+        <h3 class="text-lg font-semibold text-inkPrimary">Member Sign In</h3>
+        <button onclick="closeModal('account-modal')" class="p-1.5 rounded-full hover:bg-surfaceSoft text-inkSecondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="py-4 space-y-3">
+        <p class="text-xs text-inkSecondary">Sync your cash back balance, saved deals, and Zmanim preferences across devices.</p>
+        <input id="member-email-input" type="email" placeholder="you@example.com" class="w-full px-4 py-2.5 rounded-2xl border border-hairline text-sm focus:outline-none focus:border-brandBlue" />
+        <button onclick="completeSignIn()" class="tactile-btn w-full py-2.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-sm font-semibold">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Explainer Modal — honest status for features that are not
+       live yet (no fake controls) -->
+  <div id="feature-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('feature-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-3">
+          <h3 id="feature-modal-title" class="text-xl font-bold text-inkPrimary">Feature</h3>
+          <button onclick="closeModal('feature-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <span id="feature-modal-status" class="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-brandBlue text-[11px] font-semibold"></span>
+        <p id="feature-modal-body" class="mt-4 text-sm leading-relaxed text-inkSecondary"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Vault Modal — REAL feature: a single on/off flag on this
+       device; while on, chat history is not kept and nothing is stored -->
+  <div id="privacy-vault-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('privacy-vault-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-3">
+          <h3 class="text-xl font-bold text-inkPrimary">Privacy Vault</h3>
+          <button onclick="closeModal('privacy-vault-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <p class="text-sm leading-relaxed text-inkSecondary">When Privacy Vault is on, this device stops keeping your activity: chats are not added to the Chat history list, and no conversation is saved to send along with your questions. Turning it on also erases the chat history stored from this session.</p>
+        <div id="vault-toggle-row" onclick="togglePrivacyVault()" class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-gray-50 px-4 py-3.5 cursor-pointer">
+          <div>
+            <p class="text-sm font-semibold text-inkPrimary">Privacy Vault</p>
+            <p id="vault-status-text" class="text-xs text-inkSecondary mt-0.5">Off — chat history is kept on this device.</p>
+          </div>
+          <button id="vault-toggle" type="button" role="switch" aria-checked="false" onclick="event.stopPropagation(); togglePrivacyVault();" class="kw-vault-switch" aria-label="Toggle Privacy Vault">
+            <span id="vault-toggle-knob" class="kw-vault-knob"></span>
+          </button>
+        </div>
+        <p class="mt-4 text-[11px] leading-relaxed text-inkTertiary">Only this on/off choice itself is remembered on this device — nothing about your chats or searches is stored while the Vault is on.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shabbos Lists Modal — REAL feature: pre-built checklists, ticks
+       saved on this device only; no prices (bundle pricing is later) -->
+  <div id="shabbos-lists-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeModal('shabbos-lists-modal')">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-xl font-bold text-inkPrimary">Shabbos &amp; Yom Tov Lists</h3>
+          <button onclick="closeModal('shabbos-lists-modal')" class="text-inkTertiary hover:text-inkPrimary shrink-0" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <p class="text-sm leading-relaxed text-inkSecondary">Ready-made checklists — tick items off as you pack them away. Your ticks are saved on this device.</p>
+        <div id="shabbos-lists-body" class="mt-4"></div>
+        <button type="button" onclick="clearShabbosLists()" class="mt-5 text-xs font-semibold text-brandBlue hover:underline cursor-pointer">Clear all ticks</button>
+        <p class="mt-3 text-[11px] leading-relaxed text-inkTertiary">One-click bundle pricing across stores arrives in a later phase — these lists don't show prices yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clean Floating Toast Notification -->
+  <div id="toast-bar" class="hidden fixed bottom-6 right-6 z-50 bg-inkPrimary text-white px-5 py-3 rounded-full shadow-launcher flex items-center gap-2.5 text-xs sm:text-sm font-medium">
+    <span class="w-2 h-2 rounded-full bg-logoGreen"></span>
+    <span id="toast-text">Done</span>
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    // --- Application State ---
+    let currentView = 'home';
+    let homeSearchScope = 'all';
+    let specialsStartIdx = 0;
+    let specialsTimer = null;
+    let specialsPauseUntil = 0;
+    let specialsHovering = false;
+    let userPoints = 1250;
+    let userCashback = 84.50;
+    let selectedCardFilter = 'all';
+    let comparedCardIds = [];
+    let selectedDealFilter = 'all';
+    let selectedCalendarDay = 19; // Nov 19 = 9 Kislev
+
+    // --- Datasets ---
+    const sponsors = [
+      {
+        store: "Elevate Jewels",
+        title: "Elevate Jewels — Fine Diamond & Gold Collections",
+        desc: "Certified GIA diamonds, wedding bands, and heirloom pieces with direct workshop pricing and instant 2% cash back.",
+        badge: "2% Cash Back + 150 Pts"
+      },
+      {
+        store: "Infinite Lighting",
+        title: "Infinite Lighting — Architectural Chandeliers & Home Fixtures",
+        desc: "Designer dining room chandeliers and smart home lighting with guaranteed lowest pricing and fast delivery.",
+        badge: "2% Cash Back + 150 Pts"
+      },
+      {
+        store: "Crown Sterling Judaica",
+        title: "Crown Sterling Judaica — Handcrafted Silver & Gifts",
+        desc: "Heirloom Shabbat candlesticks, kiddush cups, and menorahs with complimentary engraving and 2.5% cash back.",
+        badge: "2.5% Cash Back + 200 Pts"
+      }
+    ];
+
+    const zmanimData = {
+      brooklyn: {
+        name: "Brooklyn, NY",
+        times: [
+          { label: "Alos HaShachar (Dawn)", time: "5:32 AM" },
+          { label: "Netz HaChama (Sunrise)", time: "6:47 AM" },
+          { label: "Sof Zman Krias Shema", time: "9:14 AM" },
+          { label: "Sof Zman Tefillah", time: "10:03 AM" },
+          { label: "Chatzos (Midday)", time: "11:41 AM" },
+          { label: "Mincha Gedolah", time: "12:11 PM" },
+          { label: "Shkiah (Sunset)", time: "4:34 PM" },
+          { label: "Tzais HaKochavim (Nightfall)", time: "5:17 PM" },
+          { label: "Friday Candle Lighting", time: "4:16 PM", highlight: true }
+        ]
+      },
+      lakewood: {
+        name: "Lakewood, NJ",
+        times: [
+          { label: "Alos HaShachar (Dawn)", time: "5:34 AM" },
+          { label: "Netz HaChama (Sunrise)", time: "6:49 AM" },
+          { label: "Sof Zman Krias Shema", time: "9:16 AM" },
+          { label: "Sof Zman Tefillah", time: "10:05 AM" },
+          { label: "Chatzos (Midday)", time: "11:43 AM" },
+          { label: "Mincha Gedolah", time: "12:13 PM" },
+          { label: "Shkiah (Sunset)", time: "4:37 PM" },
+          { label: "Tzais HaKochavim (Nightfall)", time: "5:20 PM" },
+          { label: "Friday Candle Lighting", time: "4:19 PM", highlight: true }
+        ]
+      },
+      monsey: {
+        name: "Monsey, NY",
+        times: [
+          { label: "Alos HaShachar (Dawn)", time: "5:33 AM" },
+          { label: "Netz HaChama (Sunrise)", time: "6:48 AM" },
+          { label: "Sof Zman Krias Shema", time: "9:15 AM" },
+          { label: "Sof Zman Tefillah", time: "10:04 AM" },
+          { label: "Chatzos (Midday)", time: "11:42 AM" },
+          { label: "Mincha Gedolah", time: "12:12 PM" },
+          { label: "Shkiah (Sunset)", time: "4:33 PM" },
+          { label: "Tzais HaKochavim (Nightfall)", time: "5:16 PM" },
+          { label: "Friday Candle Lighting", time: "4:15 PM", highlight: true }
+        ]
+      },
+      jerusalem: {
+        name: "Jerusalem, Israel",
+        times: [
+          { label: "Alos HaShachar (Dawn)", time: "4:58 AM" },
+          { label: "Netz HaChama (Sunrise)", time: "6:12 AM" },
+          { label: "Sof Zman Krias Shema", time: "8:44 AM" },
+          { label: "Sof Zman Tefillah", time: "9:35 AM" },
+          { label: "Chatzos (Midday)", time: "11:16 AM" },
+          { label: "Mincha Gedolah", time: "11:46 AM" },
+          { label: "Shkiah (Sunset)", time: "4:21 PM" },
+          { label: "Tzais HaKochavim (Nightfall)", time: "4:58 PM" },
+          { label: "Friday Candle Lighting", time: "4:02 PM", highlight: true }
+        ]
+      },
+      london: {
+        name: "London, UK",
+        times: [
+          { label: "Alos HaShachar (Dawn)", time: "5:56 AM" },
+          { label: "Netz HaChama (Sunrise)", time: "7:26 AM" },
+          { label: "Sof Zman Krias Shema", time: "9:38 AM" },
+          { label: "Sof Zman Tefillah", time: "10:22 AM" },
+          { label: "Chatzos (Midday)", time: "11:51 AM" },
+          { label: "Mincha Gedolah", time: "12:21 PM" },
+          { label: "Shkiah (Sunset)", time: "4:06 PM" },
+          { label: "Tzais HaKochavim (Nightfall)", time: "4:54 PM" },
+          { label: "Friday Candle Lighting", time: "3:48 PM", highlight: true }
+        ]
+      }
+    };
+
+    const creditCardsData = [
+      {
+        id: 'kw-cash',
+        name: "kosher web Everyday 2% Cash",
+        categories: ['nofee', 'cashback'],
+        badge: "Flat 2% Cash Back",
+        color: "bg-logoBlue",
+        bonus: "$250 Welcome Cash Bonus",
+        fee: "$0 Annual Fee",
+        apr: "18.49% – 25.49%",
+        rate: 0.02,
+        welcomeVal: 250,
+        perks: ["Unlimited 2% cash back on every purchase", "+1% extra boost at kosher web partner stores", "No foreign transaction fees"]
+      },
+      {
+        id: 'sapphire-dining',
+        name: "Sapphire Dining & Supermarket 4x",
+        categories: ['travel', 'cashback'],
+        badge: "4x Dining & Groceries",
+        color: "bg-logoYellow",
+        bonus: "60,000 Points ($750 Travel Value)",
+        fee: "$95 Annual Fee",
+        apr: "19.99% – 27.99%",
+        rate: 0.03,
+        welcomeVal: 750,
+        perks: ["4x points on kosher supermarkets & restaurants", "3x points on flights & family hotels", "Primary auto rental collision coverage"]
+      },
+      {
+        id: 'freedom-unlimited',
+        name: "Freedom Flex 5% Rotating Categories",
+        categories: ['nofee', 'cashback'],
+        badge: "5% Quarterly Bonus",
+        color: "bg-logoRed",
+        bonus: "$200 Bonus + 0% Intro APR (15 Mos)",
+        fee: "$0 Annual Fee",
+        apr: "0% Intro APR, then 19.24%",
+        rate: 0.025,
+        welcomeVal: 200,
+        perks: ["5% cash back on rotating quarterly categories", "3% back on dining and drugstores", "Cell phone protection included"]
+      },
+      {
+        id: 'biz-advantage',
+        name: "Commerce Pro Business Ink",
+        categories: ['nofee', 'business'],
+        badge: "0% Intro APR Business",
+        color: "bg-logoGreen",
+        bonus: "$500 Statement Credit",
+        fee: "$0 Annual Fee",
+        apr: "0% Intro APR (12 Mos)",
+        rate: 0.025,
+        welcomeVal: 500,
+        perks: ["3% cash back on shipping, internet & advertising", "Free employee cards with spend controls", "0% intro APR for 12 full months"]
+      }
+    ];
+
+    const dealsData = [
+      {
+        id: 1,
+        title: "14K Gold Classic Diamond Tennis Bracelet",
+        store: "Elevate Jewels",
+        category: "judaica",
+        price: "$1,490",
+        was: "$2,150",
+        cashback: "2% Cash Back",
+        compare: "Lowest across 4 jewelers"
+      },
+      {
+        id: 2,
+        title: "Modern Brass 12-Light Dining Chandelier",
+        store: "Infinite Lighting",
+        category: "home",
+        price: "$429",
+        was: "$640",
+        cashback: "2% Cash Back",
+        compare: "Lowest across 6 stores"
+      },
+      {
+        id: 3,
+        title: "Sterling Silver Beveled Shabbat Candlesticks",
+        store: "Crown Sterling Judaica",
+        category: "judaica",
+        price: "$315",
+        was: "$450",
+        cashback: "2.5% Cash Back",
+        compare: "Lowest across 5 Judaica shops"
+      },
+      {
+        id: 4,
+        title: "Pro Wireless Noise-Canceling Headphones",
+        store: "NexaTech Direct",
+        category: "electronics",
+        price: "$248",
+        was: "$349",
+        cashback: "3% Cash Back",
+        compare: "Lowest across 7 stores"
+      },
+      {
+        id: 5,
+        title: "Organic Pantry Staples Family Bundle (12-Pack)",
+        store: "Shop-Local Market",
+        category: "grocery",
+        price: "$86",
+        was: "$118",
+        cashback: "2% Cash Back",
+        compare: "Lowest across 3 grocers"
+      },
+      {
+        id: 6,
+        title: "Weekend Getaway Hotel Voucher — 2 Nights",
+        store: "Kosher Getaways",
+        category: "travel",
+        price: "$379",
+        was: "$520",
+        cashback: "2% Cash Back",
+        compare: "Lowest across 4 booking sites"
+      },
+      {
+        id: 7,
+        title: "Cast-Iron Shabbat Hot Plate (Blech) 24-Inch",
+        store: "Crown Home & Judaica",
+        category: "home",
+        price: "$129",
+        was: "$180",
+        cashback: "2% Cash Back",
+        compare: "Lowest across 4 stores"
+      },
+      {
+        id: 8,
+        title: "Smart Wi-Fi Shabbat Timer Plug (2-Pack)",
+        store: "NexaTech Direct",
+        category: "electronics",
+        price: "$39",
+        was: "$59",
+        cashback: "3% Cash Back",
+        compare: "Lowest across 5 stores"
+      }
+    ];
+
+    const directoryPros = [
+      {
+        initials: "DL",
+        name: "David Levine, CPA",
+        role: "Senior Tax & Business Advisory",
+        category: "Finance & Tax",
+        location: "Brooklyn & Manhattan, NY",
+        rating: "5.0 • 88 Verified Reviews",
+        badgeBg: "bg-blue-50 text-logoBlue"
+      },
+      {
+        initials: "MK",
+        name: "Moshe Katz — Executive Recruiting",
+        role: "Tech, Finance & Healthcare Talent Placement",
+        category: "Recruiting & Jobs",
+        location: "New York & Remote Nationwide",
+        rating: "4.9 • 114 Verified Placements",
+        badgeBg: "bg-green-50 text-logoGreen"
+      },
+      {
+        initials: "AR",
+        name: "Avi Rosen — Master Commercial Electrician",
+        role: "Licensed Residential & Retail Buildouts",
+        category: "Home & Contractors",
+        location: "Brooklyn, Queens & Monsey",
+        rating: "4.9 • 76 Verified Projects",
+        badgeBg: "bg-amber-50 text-amber-800"
+      },
+      {
+        initials: "YF",
+        name: "Yaakov Friedman, Esq.",
+        role: "Mortgage & Real Estate Attorney",
+        category: "Legal & Real Estate",
+        location: "Lakewood, NJ",
+        rating: "4.8 • 63 Verified Clients",
+        badgeBg: "bg-blue-50 text-logoBlue"
+      },
+      {
+        initials: "CW",
+        name: "Chaim Weiss — Kitchen & Bath Remodeling",
+        role: "Licensed Home Renovation Contractor",
+        category: "Home & Contractors",
+        location: "Monsey & Rockland County",
+        rating: "4.9 • 57 Verified Projects",
+        badgeBg: "bg-amber-50 text-amber-800"
+      },
+      {
+        initials: "RA",
+        name: "Rivkah Adler — Healthcare Staffing",
+        role: "Senior Healthcare Recruiter",
+        category: "Recruiting & Jobs",
+        location: "Brooklyn, NY",
+        rating: "5.0 • 92 Verified Placements",
+        badgeBg: "bg-green-50 text-logoGreen"
+      },
+      {
+        initials: "NB",
+        name: "Noach Bergman — Small Business Bookkeeping",
+        role: "Payroll, Invoicing & Monthly Close",
+        category: "Finance & Tax",
+        location: "Remote · NYC Metro",
+        rating: "4.8 • 41 Verified Reviews",
+        badgeBg: "bg-blue-50 text-logoBlue"
+      }
+    ];
+
+    // --- Extra State (completion) ---
+    let currentZmanimCity = 'brooklyn';
+    let weatherCityIdx = 0;
+    let streakClaimed = false;
+    let toastTimer = null;
+    let currentAcResults = [];
+
+    const weatherCities = [
+      "Brooklyn, NY · 54°F Clear",
+      "Lakewood, NJ · 52°F Sunny",
+      "Monsey, NY · 50°F Partly Cloudy",
+      "Jerusalem, Israel · 68°F Clear"
+    ];
+
+    const APP_VIEWS = ['home', 'calendar', 'cards', 'deals', 'directory', 'rewards', 'sponsor', 'chat'];
+
+    // --- Small Helpers ---
+    function fmtNum(n) {
+      return n.toLocaleString('en-US');
+    }
+
+    function fmtMoney(n) {
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function tierInfo(points) {
+      if (points >= 2000) return { name: 'Platinum', next: null, remaining: 0 };
+      return { name: 'Gold', next: 'Platinum', remaining: 2000 - points };
+    }
+
+    // Keep every points / cash back display in sync from the single state.
+    function syncPoints() {
+      const tier = tierInfo(userPoints);
+      const headerLabel = document.getElementById('header-points-label');
+      if (headerLabel) headerLabel.textContent = fmtNum(userPoints) + ' pts · Tier: ' + tier.name;
+      const walletTotal = document.getElementById('wallet-points-total');
+      if (walletTotal) walletTotal.textContent = fmtNum(userPoints) + ' pts';
+      const tierSub = document.getElementById('wallet-tier-sub');
+      if (tierSub) {
+        tierSub.textContent = tier.next
+          ? tier.name + ' Tier · ' + fmtNum(tier.remaining) + ' pts to ' + tier.next
+          : tier.name + ' Tier · Top tier reached';
+      }
+      const walletBalance = document.getElementById('wallet-cashback-balance');
+      if (walletBalance) walletBalance.textContent = fmtMoney(userCashback);
+    }
+
+    // --- Toast ---
+    function showToast(message) {
+      const bar = document.getElementById('toast-bar');
+      const text = document.getElementById('toast-text');
+      if (!bar || !text) return;
+      text.textContent = message;
+      bar.classList.remove('hidden');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => bar.classList.add('hidden'), 3200);
+    }
+
+    // --- Modals ---
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+
+    function openAccountModal() {
+      openModal('account-modal');
+    }
+
+    // --- App View Switching ---
+    function switchAppView(view) {
+      if (!APP_VIEWS.includes(view)) view = 'home';
+      currentView = view;
+      APP_VIEWS.forEach(v => {
+        const section = document.getElementById('view-' + v);
+        if (section) section.classList.toggle('hidden', v !== view);
+      });
+      document.querySelectorAll('.nav-pill').forEach(pill => {
+        const isActive = pill.getAttribute('data-nav') === view;
+        pill.classList.remove('bg-white', 'text-brandBlue', 'shadow-xs', 'text-inkSecondary', 'hover:text-inkPrimary');
+        if (isActive) {
+          pill.classList.add('bg-white', 'text-brandBlue', 'shadow-xs');
+        } else {
+          pill.classList.add('text-inkSecondary', 'hover:text-inkPrimary');
+        }
+      });
+      closeLauncher();
+      try { window.scrollTo(0, 0); } catch (e) { /* scroll is cosmetic */ }
+    }
+
+    // --- Header Weather Pill ---
+    function cycleWeatherLocation() {
+      weatherCityIdx = (weatherCityIdx + 1) % weatherCities.length;
+      const label = document.getElementById('top-weather-label');
+      if (label) label.textContent = weatherCities[weatherCityIdx];
+    }
+
+    // --- 9-Dot App Launcher ---
+    function toggleLauncher(event) {
+      if (event) event.stopPropagation();
+      const menu = document.getElementById('launcher-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function closeLauncher() {
+      const menu = document.getElementById('launcher-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    function launchApp(view) {
+      closeLauncher();
+      switchAppView(view);
+    }
+
+    document.addEventListener('click', function (event) {
+      const menu = document.getElementById('launcher-menu');
+      if (menu && !menu.classList.contains('hidden')) {
+        const trigger = document.getElementById('launcher-trigger');
+        if (!menu.contains(event.target) && !(trigger && trigger.contains(event.target))) {
+          closeLauncher();
+        }
+      }
+      const dropdown = document.getElementById('home-autocomplete');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        const input = document.getElementById('home-search-input');
+        if (!dropdown.contains(event.target) && event.target !== input) {
+          dropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    // --- Sign In ---
+    function completeSignIn() {
+      const input = document.getElementById('member-email-input');
+      const email = input ? input.value.trim() : '';
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Please enter a valid email address to sign in.');
+        return;
+      }
+      const btn = document.getElementById('header-signin-btn');
+      if (btn) btn.textContent = 'My Account';
+      closeModal('account-modal');
+      showToast('Welcome — you are signed in as ' + email + '.');
+    }
+
+    // --- Home Search ---
+    const SEARCH_DESTINATIONS = [
+      { type: 'chat', label: 'Kosher Chat', sub: 'Business assistant — ask about your business', view: 'chat', keywords: 'kosher chat ai assistant chat business help ask' },
+      { type: 'calendar', label: 'Jewish Calendar & Zmanim', sub: 'Hebrew dates, Shabbat times & holidays', view: 'calendar', keywords: 'calendar zmanim shabbat hebrew date kislev parsha candle lighting times' },
+      { type: 'cards', label: 'Credit Card Offers', sub: 'Compare cash back, travel & business cards', view: 'cards', keywords: 'credit card offers rewards apr bonus compare' },
+      { type: 'deals', label: 'Best-Price Deals', sub: 'Verified lowest prices at partner stores', view: 'deals', keywords: 'deals shopping price store discount lowest' },
+      { type: 'directory', label: 'Verified Directory', sub: 'Trusted professionals & service specialists', view: 'directory', keywords: 'directory contacts pros services professionals verified' },
+      { type: 'rewards', label: 'Cash Back Wallet', sub: 'Claim cash back & track member points', view: 'rewards', keywords: 'cash back rewards points wallet claim balance' },
+      { type: 'sponsor', label: 'Sponsor Spotlight', sub: 'Feature your business on kosher web', view: 'sponsor', keywords: 'sponsor advertise business spotlight partner' }
+    ];
+
+    function buildSearchIndex() {
+      const index = SEARCH_DESTINATIONS.slice();
+      dealsData.forEach(deal => {
+        index.push({
+          type: 'deals',
+          label: deal.title,
+          sub: deal.store + ' · ' + deal.price + ' · ' + deal.cashback,
+          view: 'deals',
+          keywords: (deal.title + ' ' + deal.store + ' ' + deal.category).toLowerCase()
+        });
+      });
+      creditCardsData.forEach(card => {
+        index.push({
+          type: 'cards',
+          label: card.name,
+          sub: card.badge + ' · ' + card.bonus,
+          view: 'cards',
+          keywords: (card.name + ' ' + card.badge + ' ' + card.bonus).toLowerCase()
+        });
+      });
+      directoryPros.forEach(pro => {
+        index.push({
+          type: 'directory',
+          label: pro.name,
+          sub: pro.role + ' · ' + pro.location,
+          view: 'directory',
+          keywords: (pro.name + ' ' + pro.role + ' ' + pro.category + ' ' + pro.location).toLowerCase()
+        });
+      });
+      sponsors.forEach(sponsor => {
+        index.push({
+          type: 'deals',
+          label: sponsor.store,
+          sub: 'Verified Sponsor · ' + sponsor.badge,
+          view: 'home',
+          keywords: (sponsor.store + ' ' + sponsor.title).toLowerCase()
+        });
+      });
+      return index;
+    }
+
+    const SEARCH_INDEX = buildSearchIndex();
+
+    function setHomeSearchScope(scope) {
+      homeSearchScope = scope;
+      document.querySelectorAll('.scope-chip').forEach(chip => {
+        const isActive = chip.getAttribute('data-scope') === scope;
+        chip.classList.remove('bg-blue-50', 'text-brandBlue', 'border-blue-200/80', 'bg-surfaceSoft', 'text-inkSecondary', 'hover:bg-gray-100', 'border-hairline');
+        if (isActive) {
+          chip.classList.add('bg-blue-50', 'text-brandBlue', 'border', 'border-blue-200/80');
+        } else {
+          chip.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'hover:bg-gray-100', 'border', 'border-hairline');
+        }
+      });
+      const input = document.getElementById('home-search-input');
+      renderAutocomplete(input ? input.value : '');
+    }
+
+    function searchMatches(query) {
+      const q = (query || '').trim().toLowerCase();
+      return SEARCH_INDEX.filter(item => {
+        if (homeSearchScope !== 'all' && item.type !== homeSearchScope) return false;
+        if (!q) return true;
+        return item.label.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q) || item.keywords.includes(q);
+      });
+    }
+
+    function renderAutocomplete(query) {
+      const container = document.getElementById('autocomplete-items');
+      const count = document.getElementById('autocomplete-count');
+      if (!container) return;
+      const q = (query || '').trim();
+      if (!q && homeSearchScope === 'all') {
+        currentAcResults = SEARCH_DESTINATIONS.slice();
+        if (count) count.textContent = SEARCH_DESTINATIONS.length + ' quick destinations';
+      } else {
+        currentAcResults = searchMatches(q).slice(0, 8);
+        if (count) count.textContent = currentAcResults.length + (currentAcResults.length === 1 ? ' match' : ' matches');
+      }
+      if (currentAcResults.length === 0) {
+        container.innerHTML = '<div class="px-5 py-4 text-sm text-inkSecondary">No matches — try a store, card, or service name.</div>';
+        return;
+      }
+      container.innerHTML = currentAcResults.map((item, idx) => `
+        <button onclick="goToSearchResult(${idx})" class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-surfaceSoft text-left transition">
+          <span class="min-w-0">
+            <span class="block text-sm font-medium text-inkPrimary truncate">${item.label}</span>
+            <span class="block text-xs text-inkSecondary truncate">${item.sub}</span>
+          </span>
+          <span class="shrink-0 px-2.5 py-0.5 rounded-full bg-surfaceSoft border border-hairline text-[11px] font-semibold text-inkSecondary capitalize">${item.type}</span>
+        </button>
+      `).join('');
+    }
+
+    function openHomeAutocomplete() {
+      const dropdown = document.getElementById('home-autocomplete');
+      const input = document.getElementById('home-search-input');
+      renderAutocomplete(input ? input.value : '');
+      if (dropdown) dropdown.classList.remove('hidden');
+    }
+
+    function handleHomeSearch(value) {
+      const clearBtn = document.getElementById('home-search-clear');
+      if (clearBtn) clearBtn.classList.toggle('hidden', !value);
+      renderAutocomplete(value);
+      const dropdown = document.getElementById('home-autocomplete');
+      if (dropdown) dropdown.classList.remove('hidden');
+    }
+
+    function goToSearchResult(idx) {
+      const item = currentAcResults[idx];
+      const dropdown = document.getElementById('home-autocomplete');
+      if (dropdown) dropdown.classList.add('hidden');
+      if (!item) return;
+      switchAppView(item.view);
+      showToast('Showing: ' + item.label);
+    }
+
+    function executeHomeSearch() {
+      const input = document.getElementById('home-search-input');
+      const q = input ? input.value.trim() : '';
+      const dropdown = document.getElementById('home-autocomplete');
+      if (dropdown) dropdown.classList.add('hidden');
+      if (!q) {
+        showToast('Type what you are looking for — a product, card, zmanim, or a trusted contact.');
+        return;
+      }
+      const matches = searchMatches(q);
+      if (matches.length === 0) {
+        showToast('No matches for "' + q + '" — try a store, card, or service name.');
+        return;
+      }
+      switchAppView(matches[0].view);
+      showToast(matches.length + (matches.length === 1 ? ' match' : ' matches') + ' for "' + q + '" — top result: ' + matches[0].label);
+    }
+
+    function clearHomeSearch() {
+      const input = document.getElementById('home-search-input');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('home-search-clear');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderAutocomplete('');
+    }
+
+    function triggerSmartMatch() {
+      let best = null;
+      let bestRate = -1;
+      dealsData.forEach(deal => {
+        const m = /([\d.]+)%/.exec(deal.cashback);
+        const rate = m ? parseFloat(m[1]) : 0;
+        if (rate > bestRate) { bestRate = rate; best = deal; }
+      });
+      if (!best) return;
+      showToast('Smart Match: ' + best.title + ' at ' + best.store + ' — ' + best.price + ' with ' + best.cashback + '.');
+      openClaimModal(best.store);
+    }
+
+    // --- Today's Specials (Home) — always exactly 3 deal cards, auto-rotates every 2 seconds ---
+    const SPECIALS_AUTO_MS = 2000;
+    const SPECIALS_RESUME_MS = 8000;
+    const DEAL_VISUALS = {
+      electronics: { bg: 'bg-blue-50', fg: 'text-logoBlue', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0116 0v2"/><rect x="2.5" y="14" width="4.5" height="6.5" rx="2"/><rect x="17" y="14" width="4.5" height="6.5" rx="2"/></svg>' },
+      home: { bg: 'bg-amber-50', fg: 'text-logoYellow', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0012 3z"/></svg>' },
+      judaica: { bg: 'bg-indigo-50', fg: 'text-indigo-500', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 3.5l2.3 4.2 2.3-4.2M9.7 16.3L12 20.5l2.3-4.2M5.6 8.2h12.8M5.6 15.8h12.8M7.4 8.2L5.6 15.8M16.6 8.2l1.8 7.6M9.7 8.2h4.6M9.7 15.8h4.6"/></svg>' },
+      grocery: { bg: 'bg-green-50', fg: 'text-logoGreen', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M5 8h14l-1.3 11a2 2 0 01-2 1.8H8.3a2 2 0 01-2-1.8L5 8z"/><path d="M8.5 10V6.5a3.5 3.5 0 017 0V10"/></svg>' },
+      travel: { bg: 'bg-cyan-50', fg: 'text-cyan-600', icon: '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2.5"/><path d="M9 8V6.5A2.5 2.5 0 0111.5 4h1A2.5 2.5 0 0115 6.5V8M4 13h16"/></svg>' }
+    };
+
+    function specialCardHTML(deal) {
+      const visual = DEAL_VISUALS[deal.category] || DEAL_VISUALS.home;
+      return `
+        <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 p-4 flex flex-col" data-special-deal="${deal.id}">
+          <div class="h-24 rounded-2xl ${visual.bg} ${visual.fg} flex items-center justify-center mb-3">${visual.icon}</div>
+          <h3 class="text-sm font-semibold text-inkPrimary leading-snug mb-1">${deal.title}</h3>
+          <p class="text-xs font-medium text-brandBlue mb-1.5">${deal.store}</p>
+          <p class="text-xs text-inkSecondary mb-1">Now <span class="text-sm font-bold text-inkPrimary">${deal.price}</span> (was ${deal.was})</p>
+          <p class="text-[11px] font-semibold text-logoGreen mb-3">${deal.cashback}</p>
+          <div class="mt-auto flex justify-end">
+            <button onclick="openClaimModal('${deal.store}')" class="tactile-btn px-4 py-1.5 rounded-full bg-surfaceSoft border border-hairline hover:bg-gray-100 text-inkPrimary text-xs font-semibold">Claim</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSpecials() {
+      const wrap = document.getElementById('home-specials-cards');
+      if (!wrap || !dealsData.length) return;
+      const cards = [];
+      for (let i = 0; i < 3; i++) {
+        cards.push(specialCardHTML(dealsData[(specialsStartIdx + i) % dealsData.length]));
+      }
+      wrap.innerHTML = cards.join('');
+      const dots = document.getElementById('home-specials-dots');
+      if (dots) {
+        dots.innerHTML = dealsData.map((deal, idx) => `
+          <button onclick="setSpecialStart(${idx})" class="w-2 h-2 rounded-full ${idx === specialsStartIdx ? 'bg-brandBlue' : 'bg-gray-300'}" aria-label="Show specials from deal ${idx + 1}"></button>
+        `).join('');
+      }
+    }
+
+    function setSpecialStart(idx) {
+      specialsStartIdx = ((idx % dealsData.length) + dealsData.length) % dealsData.length;
+      renderSpecials();
+    }
+
+    function pauseSpecials(ms) {
+      specialsPauseUntil = Date.now() + (ms || SPECIALS_RESUME_MS);
+    }
+
+    function nextSpecial() {
+      pauseSpecials();
+      setSpecialStart(specialsStartIdx + 1);
+    }
+
+    function prevSpecial() {
+      pauseSpecials();
+      setSpecialStart(specialsStartIdx - 1);
+    }
+
+    function specialsAutoTick() {
+      if (specialsTimer === null) return;
+      if (currentView !== 'home') return;
+      if (specialsHovering) return;
+      if (Date.now() < specialsPauseUntil) return;
+      if (typeof document !== 'undefined' && document.hidden) return;
+      setSpecialStart(specialsStartIdx + 1);
+    }
+
+    function startSpecialsAuto() {
+      if (specialsTimer !== null) return;
+      specialsTimer = setInterval(specialsAutoTick, SPECIALS_AUTO_MS);
+    }
+
+    // "See all specials" — the doorway from the box to the full Deals view (with its category filters)
+    function openAllSpecials() {
+      filterDealsCategory('all');
+      switchAppView('deals');
+    }
+
+    // --- Claim / Offer Activation ---
+    function openClaimModal(storeName) {
+      const storeEl = document.getElementById('claim-modal-store');
+      if (storeEl && storeName) storeEl.textContent = storeName;
+      openModal('claim-modal');
+    }
+
+    function confirmOfferActivation() {
+      userPoints += 50;
+      syncPoints();
+      closeModal('claim-modal');
+      showToast('+50 activation points added — your cash back session is tagged.');
+    }
+
+    // --- Jewish Calendar & Zmanim ---
+    const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Shabbat'];
+    // November 2026: Nov 1 is a Sunday; 9 Kislev 5787 falls on Thursday, Nov 19.
+    const PARSHA_BY_WEEK = ['Parashat Vayera', 'Parashat Chayei Sarah', 'Parashat Vayetzei', 'Parashat Vayishlach', 'Parashat Vayeshev'];
+
+    function hebrewDateFor(day) {
+      if (day <= 10) return (20 + day) + ' Cheshvan 5787';
+      return (day - 10) + ' Kislev 5787';
+    }
+
+    function hebrewShortFor(day) {
+      if (day <= 10) return (20 + day) + ' Cheshvan';
+      return (day - 10) + ' Kislev';
+    }
+
+    function calendarNoteFor(day) {
+      const weekdayIdx = (day - 1) % 7; // 0 = Sunday ... 5 = Friday, 6 = Shabbat
+      const weekIdx = Math.floor((day - 1) / 7);
+      const daf = 42 - (19 - day);
+      const city = zmanimData[currentZmanimCity];
+      const candle = city.times.find(t => t.highlight);
+      if (weekdayIdx === 6) return 'Shabbat ' + PARSHA_BY_WEEK[weekIdx] + ' · Havdalah after nightfall';
+      if (weekdayIdx === 5) return 'Erev Shabbat · Candle Lighting ' + (candle ? candle.time : '') + ' · ' + PARSHA_BY_WEEK[weekIdx];
+      if (day === 11) return 'Rosh Chodesh Kislev · Daf Yomi: Bava Metzia ' + daf;
+      if (day === 10) return 'Rosh Chodesh Kislev (Day 1) · Daf Yomi: Bava Metzia ' + daf;
+      if (weekdayIdx === 1 || weekdayIdx === 4) return 'Torah Reading · Daf Yomi: Bava Metzia ' + daf;
+      return 'Regular Weekday · Daf Yomi: Bava Metzia ' + daf;
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('monthly-calendar-grid');
+      if (!grid) return;
+      let html = '';
+      for (let day = 1; day <= 30; day++) {
+        const weekdayIdx = (day - 1) % 7;
+        const isSelected = day === selectedCalendarDay;
+        const isShabbat = weekdayIdx === 6;
+        html += `
+          <button onclick="selectCalendarDay(${day})" class="p-2 sm:p-2.5 rounded-2xl border text-center transition flex flex-col items-center gap-0.5 ${
+            isSelected
+              ? 'bg-brandBlue text-white border-brandBlue shadow-sm'
+              : 'bg-surfaceSoft/70 hover:bg-gray-100 text-inkPrimary border-hairline'
+          }">
+            <span class="text-[10px] font-semibold uppercase ${isSelected ? 'text-blue-100' : (isShabbat ? 'text-brandBlue' : 'text-inkSecondary')}">${WEEKDAY_NAMES[weekdayIdx].slice(0, 3)}</span>
+            <span class="text-sm sm:text-base font-bold leading-none">${day}</span>
+            <span class="text-[10px] font-medium ${isSelected ? 'text-white' : 'text-brandBlue'}">${hebrewShortFor(day)}</span>
+          </button>
+        `;
+      }
+      grid.innerHTML = html;
+      renderCalendarInspector();
+      updateZmanimSubtitle();
+    }
+
+    function renderCalendarInspector() {
+      const inspector = document.getElementById('calendar-day-inspector');
+      if (!inspector) return;
+      const day = selectedCalendarDay;
+      const weekdayIdx = (day - 1) % 7;
+      inspector.innerHTML = `
+        <div>
+          <p class="text-[11px] text-inkSecondary">Selected Date</p>
+          <p class="text-sm font-bold text-inkPrimary">${WEEKDAY_NAMES[weekdayIdx]}, Nov ${day} · ${hebrewDateFor(day)}</p>
+        </div>
+        <div>
+          <p class="text-[11px] text-inkSecondary">Schedule Note</p>
+          <p class="text-xs sm:text-sm font-semibold text-brandBlue">${calendarNoteFor(day)}</p>
+        </div>
+        <div>
+          <p class="text-[11px] text-inkSecondary">Zmanim Location</p>
+          <p class="text-sm font-bold text-inkPrimary">${zmanimData[currentZmanimCity].name}</p>
+        </div>
+      `;
+    }
+
+    function selectCalendarDay(day) {
+      selectedCalendarDay = day;
+      renderCalendar();
+    }
+
+    function updateZmanimSubtitle() {
+      const subtitle = document.getElementById('zmanim-subtitle');
+      if (!subtitle) return;
+      const day = selectedCalendarDay;
+      const weekdayIdx = (day - 1) % 7;
+      const weekdayName = weekdayIdx === 6 ? 'Shabbat' : WEEKDAY_NAMES[weekdayIdx];
+      subtitle.textContent = zmanimData[currentZmanimCity].name + ' · ' + weekdayName + ', ' + hebrewShortFor(day);
+    }
+
+    function renderZmanim() {
+      const list = document.getElementById('zmanim-times-list');
+      if (!list) return;
+      const city = zmanimData[currentZmanimCity];
+      list.innerHTML = city.times.map(entry => `
+        <div class="flex items-center justify-between py-2.5 ${entry.highlight ? 'bg-blue-50/70 -mx-2 px-2 rounded-xl' : ''}">
+          <span class="text-xs sm:text-sm ${entry.highlight ? 'font-semibold text-brandBlue' : 'text-inkSecondary'}">${entry.label}</span>
+          <span class="text-sm font-bold ${entry.highlight ? 'text-brandBlue' : 'text-inkPrimary'}">${entry.time}</span>
+        </div>
+      `).join('');
+      updateZmanimSubtitle();
+      renderCalendarInspector();
+    }
+
+    function changeZmanimLocation(cityKey) {
+      if (!zmanimData[cityKey]) return;
+      currentZmanimCity = cityKey;
+      const picker = document.getElementById('zmanim-city-picker');
+      if (picker) picker.value = cityKey;
+      renderZmanim();
+      renderCalendarInspector();
+    }
+
+    function copyZmanimSchedule() {
+      const city = zmanimData[currentZmanimCity];
+      const lines = city.times.map(t => t.label + ': ' + t.time);
+      const text = 'Daily Zmanim — ' + city.name + ' · ' + hebrewDateFor(selectedCalendarDay) + '\n' + lines.join('\n');
+      const done = () => showToast('Zmanim for ' + city.name + ' copied to clipboard.');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else {
+        fallbackCopy(text, done);
+      }
+    }
+
+    function fallbackCopy(text, done) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) { /* clipboard unavailable — toast still confirms the schedule */ }
+      done();
+    }
+
+    // --- Credit Cards ---
+    function renderCardsApp() {
+      const container = document.getElementById('cards-app-grid');
+      if (!container) return;
+      const filtered = creditCardsData.filter(card =>
+        selectedCardFilter === 'all' || card.categories.includes(selectedCardFilter)
+      );
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-sm text-inkSecondary">No cards in this category yet.</p>';
+        return;
+      }
+      container.innerHTML = filtered.map(card => {
+        const inCompare = comparedCardIds.includes(card.id);
+        return `
+        <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="px-3 py-1 rounded-full bg-surfaceSoft text-inkPrimary text-xs font-semibold border border-hairline">
+                ${card.badge}
+              </span>
+              <span class="text-xs font-bold text-brandBlue">${Math.round(card.rate * 100 * 10) / 10}% Avg. Return</span>
+            </div>
+            <!-- Sleek Minimal Card Visual -->
+            <div class="h-28 rounded-2xl ${card.color} p-4 text-white flex flex-col justify-between mb-5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-semibold tracking-wider uppercase opacity-90">kosher web rewards</span>
+                <span class="w-6 h-4 rounded-sm bg-white/30"></span>
+              </div>
+              <p class="text-sm font-bold tracking-tight">${card.name}</p>
+            </div>
+            <p class="text-sm font-semibold text-logoGreen mb-1">${card.bonus}</p>
+            <p class="text-xs text-inkSecondary mb-4">${card.fee} • ${card.apr}</p>
+            <ul class="space-y-1.5 mb-5">
+              ${card.perks.map(perk => `
+                <li class="flex items-start gap-2 text-xs text-inkPrimary">
+                  <svg class="w-3.5 h-3.5 text-logoGreen shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>${perk}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+          <div class="pt-4 border-t border-hairline flex items-center gap-2">
+            <button onclick="toggleCardCompare('${card.id}')" class="tactile-btn flex-1 py-2.5 rounded-full ${inCompare ? 'bg-brandBlue text-white' : 'bg-surfaceSoft hover:bg-gray-100 text-inkPrimary'} text-xs font-semibold transition">
+              ${inCompare ? 'In Compare List' : 'Compare'}
+            </button>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function filterCreditCards(category) {
+      selectedCardFilter = category;
+      document.querySelectorAll('.card-cat-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-cardcat') === category;
+        btn.classList.remove('bg-brandBlue', 'text-white', 'font-semibold', 'bg-surfaceSoft', 'text-inkSecondary', 'font-medium', 'hover:bg-gray-100');
+        if (isActive) {
+          btn.classList.add('bg-brandBlue', 'text-white', 'font-semibold');
+        } else {
+          btn.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'font-medium', 'hover:bg-gray-100');
+        }
+      });
+      renderCardsApp();
+    }
+
+    function toggleCardCompare(cardId) {
+      const idx = comparedCardIds.indexOf(cardId);
+      if (idx >= 0) {
+        comparedCardIds.splice(idx, 1);
+      } else {
+        if (comparedCardIds.length >= 3) {
+          showToast('You can compare up to 3 cards at a time.');
+          return;
+        }
+        comparedCardIds.push(cardId);
+      }
+      renderCardsApp();
+      renderCardComparison();
+    }
+
+    function renderCardComparison() {
+      const drawer = document.getElementById('card-compare-drawer');
+      const content = document.getElementById('card-compare-content');
+      if (!drawer || !content) return;
+      if (comparedCardIds.length === 0) {
+        drawer.classList.add('hidden');
+        content.innerHTML = '';
+        return;
+      }
+      drawer.classList.remove('hidden');
+      content.innerHTML = comparedCardIds.map(id => {
+        const card = creditCardsData.find(c => c.id === id);
+        if (!card) return '';
+        return `
+          <div class="p-4 rounded-2xl bg-surfaceSoft border border-hairline">
+            <div class="h-2.5 rounded-full ${card.color} mb-3"></div>
+            <p class="text-sm font-bold text-inkPrimary mb-1">${card.name}</p>
+            <p class="text-xs font-semibold text-logoGreen mb-3">${card.bonus}</p>
+            <div class="space-y-1.5 text-xs text-inkSecondary">
+              <p><span class="font-semibold text-inkPrimary">Annual Fee:</span> ${card.fee.replace(' Annual Fee', '')}</p>
+              <p><span class="font-semibold text-inkPrimary">APR:</span> ${card.apr}</p>
+              <p><span class="font-semibold text-inkPrimary">Avg. Return:</span> ${Math.round(card.rate * 100 * 10) / 10}%</p>
+              <p><span class="font-semibold text-inkPrimary">Welcome Value:</span> $${fmtNum(card.welcomeVal)}</p>
+            </div>
+            <ul class="mt-3 space-y-1">
+              ${card.perks.map(perk => `<li class="text-[11px] text-inkSecondary">• ${perk}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function clearCardComparison() {
+      comparedCardIds = [];
+      renderCardsApp();
+      renderCardComparison();
+    }
+
+    // Estimator: first-year value = 2% of annual spend + $250 welcome bonus.
+    // At the default $3,500/mo this is $840 + $250 = $1,090, matching the design.
+    function updateSpendCalculator(value) {
+      const monthly = parseInt(value, 10) || 0;
+      const label = document.getElementById('monthly-spend-label');
+      if (label) label.textContent = '$' + fmtNum(monthly) + ' / mo';
+      const estimate = Math.round(monthly * 12 * 0.02 + 250);
+      const estimateEl = document.getElementById('estimated-annual-reward');
+      if (estimateEl) estimateEl.textContent = '$' + fmtNum(estimate);
+    }
+
+    // --- Deals & Shopping ---
+    function renderDealsApp() {
+      const container = document.getElementById('deals-app-grid');
+      if (!container) return;
+      const filtered = dealsData.filter(deal =>
+        selectedDealFilter === 'all' || deal.category === selectedDealFilter
+      );
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-sm text-inkSecondary">No deals in this category yet.</p>';
+        return;
+      }
+      container.innerHTML = filtered.map(deal => `
+        <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 p-5 flex flex-col justify-between hover:shadow-elevation-2 transition">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="px-2.5 py-0.5 rounded-full bg-green-50 text-logoGreen text-[11px] font-semibold">${deal.cashback}</span>
+              <span class="text-[11px] font-medium text-inkSecondary">${deal.store}</span>
+            </div>
+            <h3 class="text-sm font-semibold text-inkPrimary mb-1">${deal.title}</h3>
+            <p class="text-[11px] text-inkSecondary mb-4">${deal.compare}</p>
+          </div>
+          <div class="flex items-end justify-between gap-2 pt-3 border-t border-hairline">
+            <div>
+              <span class="text-lg font-bold text-inkPrimary">${deal.price}</span>
+              <span class="text-xs text-inkSecondary line-through ml-1">${deal.was}</span>
+            </div>
+            <button onclick="openClaimModal('${deal.store}')" class="tactile-btn px-4 py-1.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs font-semibold shrink-0">
+              Claim Offer
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterDealsCategory(category) {
+      selectedDealFilter = category;
+      document.querySelectorAll('.deal-cat-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-dealcat') === category;
+        btn.classList.remove('bg-brandBlue', 'text-white', 'font-semibold', 'bg-surfaceSoft', 'text-inkSecondary', 'font-medium', 'hover:bg-gray-100');
+        if (isActive) {
+          btn.classList.add('bg-brandBlue', 'text-white', 'font-semibold');
+        } else {
+          btn.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'font-medium', 'hover:bg-gray-100');
+        }
+      });
+      renderDealsApp();
+    }
+
+    // --- Verified Directory ---
+    function renderDirectoryApp() {
+      const container = document.getElementById('directory-app-grid');
+      if (!container) return;
+      const textInput = document.getElementById('directory-filter-input');
+      const catSelect = document.getElementById('directory-cat-select');
+      const q = textInput ? textInput.value.trim().toLowerCase() : '';
+      const cat = catSelect ? catSelect.value : 'all';
+      const filtered = directoryPros.filter(pro => {
+        if (cat !== 'all' && pro.category !== cat) return false;
+        if (!q) return true;
+        return (pro.name + ' ' + pro.role + ' ' + pro.category + ' ' + pro.location).toLowerCase().includes(q);
+      });
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-sm text-inkSecondary">No verified professionals match your filter.</p>';
+        return;
+      }
+      container.innerHTML = filtered.map(pro => `
+        <div class="bg-white rounded-3xl border border-hairline shadow-elevation-1 p-6 flex flex-col justify-between">
+          <div class="flex items-start gap-4 mb-4">
+            <span class="w-12 h-12 rounded-full ${pro.badgeBg} flex items-center justify-center font-bold text-sm shrink-0">${pro.initials}</span>
+            <div class="min-w-0">
+              <h3 class="text-sm font-semibold text-inkPrimary">${pro.name}</h3>
+              <p class="text-xs text-inkSecondary">${pro.role}</p>
+              <p class="text-[11px] text-inkSecondary mt-0.5">${pro.location}</p>
+              <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-surfaceSoft border border-hairline text-[11px] font-medium text-inkSecondary">${pro.category}</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-4 border-t border-hairline">
+            <span class="text-xs font-semibold text-logoGreen">★ ${pro.rating}</span>
+            <button onclick="openContactModal('${pro.name.replace(/'/g, "")}', '${pro.role.replace(/'/g, "")}')" class="tactile-btn px-4 py-1.5 rounded-full bg-brandBlue hover:bg-blue-700 text-white text-xs font-semibold">
+              Contact
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openContactModal(name, role) {
+      const nameEl = document.getElementById('contact-modal-name');
+      const roleEl = document.getElementById('contact-modal-role');
+      if (nameEl && name) nameEl.textContent = name;
+      if (roleEl) roleEl.textContent = role ? role + ' · Direct verified message' : 'Direct verified message';
+      openModal('contact-modal');
+    }
+
+    function sendDirectContact(event) {
+      event.preventDefault();
+      const form = event.target;
+      if (form) form.reset();
+      closeModal('contact-modal');
+      showToast('Your verified inquiry was sent — expect a callback soon.');
+    }
+
+    // --- Cash Back & Rewards ---
+    const REWARD_RATES = {
+      'Elevate Jewels': 0.02,
+      'Infinite Lighting': 0.02,
+      'Crown Sterling Judaica': 0.025,
+      'NexaTech Direct': 0.03,
+      'Verified Directory Specialist': 0
+    };
+
+    function processRewardsClaim(event) {
+      event.preventDefault();
+      const merchantEl = document.getElementById('rewards-merchant-select');
+      const orderEl = document.getElementById('rewards-order-input');
+      const amountEl = document.getElementById('rewards-amount-input');
+      const merchant = merchantEl ? merchantEl.value : 'Elevate Jewels';
+      const amount = amountEl ? parseFloat(amountEl.value) : NaN;
+      if (merchant === 'Verified Directory Specialist') {
+        userPoints += 250;
+        syncPoints();
+        showToast('+250 bonus points credited for your verified directory service.');
+      } else {
+        if (!amount || amount <= 0) {
+          showToast('Enter your purchase amount to verify the claim.');
+          return;
+        }
+        const rate = REWARD_RATES[merchant] || 0;
+        const earned = Math.round(amount * rate * 100) / 100;
+        userCashback = Math.round((userCashback + earned) * 100) / 100;
+        userPoints += 200;
+        syncPoints();
+        showToast(fmtMoney(earned) + ' cash back + 200 pts credited from ' + merchant + '.');
+      }
+      if (orderEl) orderEl.value = '';
+      if (amountEl) amountEl.value = '';
+    }
+
+    function claimDailyStreak() {
+      if (streakClaimed) return;
+      streakClaimed = true;
+      userPoints += 50;
+      syncPoints();
+      const btn = document.getElementById('daily-streak-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Claimed — See You Tomorrow';
+        btn.classList.remove('bg-brandBlue', 'hover:bg-blue-700');
+        btn.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'border', 'border-hairline');
+      }
+      showToast('+50 daily check-in points added to your wallet.');
+    }
+
+    // --- Sponsor Portal ---
+    function updateSponsorLivePreview() {
+      const titleInput = document.getElementById('preview-biz-title');
+      const descInput = document.getElementById('preview-biz-desc');
+      const rateSelect = document.getElementById('preview-biz-rate');
+      const title = document.getElementById('live-preview-title');
+      const desc = document.getElementById('live-preview-desc');
+      const badge = document.getElementById('live-preview-badge');
+      if (title && titleInput) title.textContent = titleInput.value || 'Your Brand — Exclusive Member Offer';
+      if (desc && descInput) desc.textContent = descInput.value || '';
+      if (badge && rateSelect) badge.textContent = rateSelect.value;
+    }
+
+    function submitSponsorBooking(event) {
+      event.preventDefault();
+      const form = event.target;
+      if (form) form.reset();
+      showToast('Sponsor request received — our team will reach out with placement details.');
+    }
+
+    // --- Opening Splash ---
+    let splashDismissed = false;
+    function dismissSplash() {
+      if (splashDismissed) return;
+      splashDismissed = true;
+      const splash = document.getElementById('kw-splash');
+      if (!splash) return;
+      splash.style.transition = 'opacity 0.35s ease';
+      splash.style.opacity = '0';
+      splash.style.pointerEvents = 'none';
+      setTimeout(() => { splash.classList.add('hidden'); }, 380);
+    }
+
+    // --- Home App Grid Helpers ---
+    function openFastSearchApp() {
+      window.open('https://elevatejewels-hq.github.io/fast-search/', '_blank');
+    }
+
+    function focusHomeSearch() {
+      switchAppView('home');
+      const input = document.getElementById('home-search-input');
+      if (input) { try { input.focus(); } catch (e) { /* focus is cosmetic */ } }
+    }
+
+    // --- Home Logo Bubbles Animation (5 seconds, HTML/CSS/JS — never a video file; the logo itself never moves) ---
+    let logoAnimTimeout = null;
+    const BUBBLE_GRADIENTS = {
+      pink: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(240,98,255,0.75) 62%, rgba(194,24,255,0.85))',
+      purple: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(149,117,255,0.75) 62%, rgba(101,31,255,0.85))',
+      blue: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(68,138,255,0.75) 62%, rgba(41,98,255,0.85))',
+      cyan: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(100,255,218,0.70) 62%, rgba(0,191,165,0.80))',
+      amber: 'radial-gradient(circle at 32% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.28) 30%, rgba(255,213,79,0.75) 62%, rgba(255,143,0,0.85))'
+    };
+    const LOGO_BUBBLES = [
+      { left: '0%', top: '8%', size: 76, c: 'pink', a: 'kw-drift-a', d: '0s' },
+      { left: '7%', top: '60%', size: 44, c: 'purple', a: 'kw-drift-b', d: '0.25s' },
+      { left: '15%', top: '-4%', size: 30, c: 'cyan', a: 'kw-drift-c', d: '0.1s' },
+      { left: '22%', top: '72%', size: 56, c: 'blue', a: 'kw-drift-b', d: '0.4s' },
+      { left: '34%', top: '0%', size: 26, c: 'amber', a: 'kw-drift-a', d: '0.55s' },
+      { left: '44%', top: '78%', size: 38, c: 'pink', a: 'kw-drift-c', d: '0.2s' },
+      { left: '55%', top: '-6%', size: 48, c: 'purple', a: 'kw-drift-a', d: '0.35s' },
+      { left: '63%', top: '66%', size: 30, c: 'cyan', a: 'kw-drift-b', d: '0.5s' },
+      { left: '71%', top: '2%', size: 58, c: 'blue', a: 'kw-drift-c', d: '0.15s' },
+      { left: '81%', top: '58%', size: 42, c: 'amber', a: 'kw-drift-a', d: '0.45s' },
+      { left: '89%', top: '10%', size: 66, c: 'pink', a: 'kw-drift-b', d: '0.3s' },
+      { left: '94%', top: '70%', size: 28, c: 'purple', a: 'kw-drift-c', d: '0.6s' },
+      { left: '48%', top: '36%', size: 20, c: 'cyan', a: 'kw-drift-a', d: '0.7s' },
+      { left: '5%', top: '34%', size: 22, c: 'blue', a: 'kw-drift-c', d: '0.65s' }
+    ];
+
+    function buildLogoBubbles(layer) {
+      layer.innerHTML = '';
+      LOGO_BUBBLES.forEach(cfg => {
+        const bubble = document.createElement('span');
+        bubble.className = 'kw-bubble ' + cfg.a;
+        bubble.style.left = cfg.left;
+        bubble.style.top = cfg.top;
+        bubble.style.width = cfg.size + 'px';
+        bubble.style.height = cfg.size + 'px';
+        bubble.style.animationDelay = cfg.d;
+        bubble.style.background = BUBBLE_GRADIENTS[cfg.c];
+        layer.appendChild(bubble);
+      });
+    }
+
+    function playLogoAnimation() {
+      const layer = document.getElementById('logo-bubbles');
+      if (!layer) return;
+      buildLogoBubbles(layer);
+      layer.classList.remove('hidden');
+      layer.classList.remove('kw-bubbles-playing');
+      void layer.offsetWidth; // restart the CSS animations when replayed
+      layer.classList.add('kw-bubbles-playing');
+      if (logoAnimTimeout) clearTimeout(logoAnimTimeout);
+      logoAnimTimeout = setTimeout(stopLogoAnimation, 5000);
+    }
+
+    function stopLogoAnimation() {
+      const layer = document.getElementById('logo-bubbles');
+      if (layer) {
+        layer.classList.remove('kw-bubbles-playing');
+        layer.classList.add('hidden');
+      }
+      if (logoAnimTimeout) { clearTimeout(logoAnimTimeout); logoAnimTimeout = null; }
+    }
+
+    // --- All Stores Directory (the full NexaMatch store list; tap: website opens in a new tab, no website → details) ---
+    const storesData = [
+      { name: "Pharmacy Plus", category: "Pharmacy", address: "728 N Main St, New Square, NY", phone: "(845) 354-9320", website: "http://www.pharmacyplus.com/" },
+      { name: "Lincoln Outerwear", category: "Clothing", address: "33 Lincoln Ave, New Square, NY", phone: "(845) 354-6096", website: null },
+      { name: "Jewel It - Custom Jewelry", category: "Jewelry", address: "10 Bush Ln, New Square, NY", phone: "(845) 364-0029", website: null },
+      { name: "Taam Eden Bakery", category: "Bakery / Food", address: "31 B Jefferson Ave, New Square, NY", phone: "(845) 354-8083", website: "https://www.facebook.com/115444131818600" },
+      { name: "F and F Variety Center", category: "Hardware / Variety", address: "39 Jefferson Ave, Spring Valley, NY", phone: "(845) 354-2374", website: "https://www.magictimes.com" },
+      { name: "Rockland Kosher Supermarket", category: "Groceries", address: "27 Orchard St, Monsey, NY", phone: "(845) 425-2266", website: "http://www.rocklandkosher.com/" },
+      { name: "Newday Market", category: "Groceries", address: "320 Saddle River Rd, Monsey, NY", phone: "(845) 414-3000", website: "http://www.newdaymonsey.com/" },
+      { name: "Mottys Supermarket", category: "Groceries", address: "18 College Rd, Monsey, NY", phone: "(845) 356-5310", website: "http://www.mottyskosher.com/" },
+      { name: "De Best Market", category: "Groceries", address: "176 Maple Ave, Monsey, NY", phone: "(845) 352-2021", website: null },
+      { name: "Kohn's Fresh Fish", category: "Food / Fish Market", address: "25 Main St, Monsey, NY", phone: "(845) 425-7776", website: null },
+      { name: "Supreme Health Food Center", category: "Health Food", address: "27 Orchard St, Monsey, NY", phone: "(845) 425-6004", website: "https://www.supremehealth.com/" },
+      { name: "Medwiz Pharmacy", category: "Pharmacy", address: "240 N Main St, Spring Valley, NY", phone: "(845) 624-5200", website: "http://medwizrx.com/" },
+      { name: "Eckerson Drugs", category: "Pharmacy", address: "287 N Main St, Spring Valley, NY", phone: "(845) 352-1800", website: "https://stores.healthmart.com/eckersondrugs" },
+      { name: "Hillcrest Pharmacy", category: "Pharmacy", address: "1 Hillcrest Center Dr, Spring Valley, NY", phone: "(845) 356-7300", website: null },
+      { name: "Pineapple Supermarket", category: "Groceries", address: "20 Mezritch Rd, Spring Valley, NY", phone: "(845) 354-5400", website: "http://www.pineapplekosher.com/" },
+      { name: "M&S Kollel Grocery", category: "Groceries", address: "44 Jefferson Ave, New Square, NY", phone: "(888) 959-2269", website: null },
+      { name: "Skvere Matzah Bakery", category: "Bakery", address: "11 Eisenhower Ave, Spring Valley, NY", phone: "(845) 362-8881", website: null },
+      { name: "Oneg Poultry Inc", category: "Butcher", address: "45 Jefferson Ave, Spring Valley, NY", phone: "(845) 354-6664", website: null },
+      { name: "Greens Delights", category: "Bakery", address: "82 Reagan Rd, Spring Valley, NY", phone: "(845) 354-2612", website: null },
+      { name: "Sparks Electronics and Housewares", category: "Electronics", address: "20 Mezritch Rd Ste 3, New Square, NY", phone: "(845) 585-7727", website: null },
+      { name: "Mable Home Furnishings", category: "Furniture", address: "40 Jefferson Ave, New Square, NY", phone: "(845) 354-2020", website: null },
+      { name: "AllmarkGifts", category: "Gift Shop", address: "29 Harrison La, New Square, NY", phone: "(646) 844-4387", website: "https://allmarkgifts.com/" },
+      { name: "Beadables Corp.", category: "Gifts & Jewelry", address: "3 Jackson Ave, New Square, NY", phone: "(845) 362-3492", website: null },
+      { name: "Menorah Judaica & Gifts", category: "Judaica & Gifts", address: "17 Koritz Way, Spring Valley, NY", phone: "(845) 354-0262", website: null },
+      { name: "B Cleaners", category: "Dry Cleaning", address: "25 Allik Way, New Square, NY", phone: "(845) 364-8255", website: null },
+      { name: "MM Tires", category: "Tires & Auto Repair", address: "674 N Main St, Spring Valley, NY", phone: "(845) 625-2050", website: null },
+      { name: "Little Caesars", category: "Pizza", address: "288 North Main St, Spring Valley, NY 10977", phone: "(845) 356-0354", website: "https://littlecaesars.com/en-us/store/10378/" },
+      { name: "Elevate Jewels", category: "Jewelry", address: "34 Main Street, Suite 213, Monsey, NY 10952", phone: null, website: "https://elevatejewelsny.com", featured: true },
+      { name: "Infinite Lighting", category: "Lighting & Home", address: "Online store", phone: null, website: "https://elevatejewels-hq.github.io/infinite-lighting/", featured: true },
+      { name: "WebFlowAI", category: "Websites & AI Services", address: "Online only", phone: null, website: "https://webflowai.app", featured: true }
+    ];
+
+    function renderStores() {
+      const grid = document.getElementById('directory-stores-grid');
+      if (!grid) return;
+      grid.innerHTML = storesData.map((store, idx) => `
+        <button onclick="openStore(${idx})" class="tactile-btn text-left bg-white rounded-3xl border border-hairline shadow-elevation-1 p-5 flex flex-col gap-1 hover:shadow-elevation-2" data-store-card="${idx}">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-green-50 text-logoGreen text-[11px] font-semibold">2% Cash Back</span>
+            ${store.featured
+              ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-[11px] font-semibold">Featured</span>'
+              : `<span class="text-[11px] font-medium text-brandBlue">${store.website ? 'Visit website →' : 'Details →'}</span>`}
+          </div>
+          <h3 class="text-sm font-semibold text-inkPrimary">${store.name}</h3>
+          <p class="text-xs text-inkSecondary">${store.category}</p>
+          <p class="text-[11px] text-inkSecondary">${store.address}</p>
+        </button>
+      `).join('');
+      const label = document.getElementById('store-count-label');
+      if (label) label.textContent = storesData.length + ' stores · 2% Cash Back';
+    }
+
+    function openStore(idx) {
+      const store = storesData[idx];
+      if (!store) return;
+      if (store.website) {
+        window.open(store.website, '_blank');
+        return;
+      }
+      const nameEl = document.getElementById('store-modal-name');
+      const catEl = document.getElementById('store-modal-category');
+      const addrEl = document.getElementById('store-modal-address');
+      const phoneEl = document.getElementById('store-modal-phone');
+      if (nameEl) nameEl.textContent = store.name;
+      if (catEl) catEl.textContent = store.category;
+      if (addrEl) addrEl.textContent = store.address;
+      if (phoneEl) phoneEl.textContent = store.phone || '—';
+      openModal('store-modal');
+    }
+
+    // --- Kosher Chat (business assistant) ---
+    // KW_CHAT is the chat back end's base URL (the kosher-web chat-backend
+    // service) and the single wiring point for the live connection: while
+    // it is empty the chat keeps its honest "being connected" replies;
+    // when the wiring step sets it to the deployed service URL, messages
+    // are answered live by the back end (see requestChatReply below).
+    const KW_CHAT = "https://kosher-chat-backend.onrender.com";
+    let chatStarted = false;
+    let chatReplyCount = 0;
+    let chatParamsOn = false;
+    let chatParamScope = 'all';
+    let chatHistory = []; // { role: 'user' | 'assistant', text } — sent with each live request (last 10 turns)
+    const CHAT_MARK_SVG = '<svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="19" cy="19" r="10.5" stroke="#4285F4" stroke-width="5"/><path d="M26.4 26.4 A10.5 10.5 0 0 1 11.6 26.4" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="27" x2="37" y2="37" stroke="#34A853" stroke-width="5" stroke-linecap="round"/><path d="M37 3 L39.2 8.3 L44.5 10.5 L39.2 12.7 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#FBBC05"/><path d="M37 3 L37 18 L34.8 12.7 L29.5 10.5 L34.8 8.3 Z" fill="#EA4335"/></svg>';
+    const CHAT_NOT_CONNECTED_FIRST = 'Thanks for your message. Kosher Chat is still being connected, so it cannot answer business questions just yet. Soon this chat will help with kosher business search, deals, zmanim and verified contacts — your message stays right here in this chat.';
+    const CHAT_NOT_CONNECTED_AGAIN = 'Kosher Chat is still being connected — as soon as the assistant is live, it will answer your business questions right here.';
+    const CHAT_UNREACHABLE = 'Sorry — I couldn\'t reach the assistant just now. Please try again in a moment.';
+    const CHAT_DOT_COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853']; // blue, red, yellow, green — the owner's typing-dots image
+
+    // The explainer lines claim "being connected" only while no back end
+    // is wired; with KW_CHAT set they simply describe the assistant.
+    (function applyChatModeText() {
+      if (!KW_CHAT) return;
+      const heroSub = document.getElementById('chat-hero-sub');
+      if (heroSub) heroSub.textContent = 'Kosher Chat is the kosher web assistant for business questions. Ask about running your business — the answer comes right here in the chat.';
+      const note = document.getElementById('chat-status-note');
+      if (note) note.textContent = 'Kosher Chat is for business questions.';
+    })();
+
+    function appendChatBubble(text, who) {
+      const thread = document.getElementById('chat-thread');
+      if (!thread) return;
+      const row = document.createElement('div');
+      if (who === 'user') {
+        row.className = 'flex justify-end';
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble-user max-w-[80%] bg-surfaceSoft border border-hairline text-inkPrimary text-sm leading-relaxed px-4 py-2.5 rounded-3xl rounded-br-lg';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+      } else {
+        row.className = 'flex items-start gap-2.5';
+        const avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 shrink-0';
+        avatar.innerHTML = CHAT_MARK_SVG;
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble-assistant max-w-[80%] bg-white border border-hairline text-inkPrimary text-sm leading-relaxed px-4 py-2.5 rounded-3xl rounded-tl-lg shadow-xs';
+        bubble.textContent = text;
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+      thread.appendChild(row);
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    }
+
+    // Assistant bubble holding the four bouncing dots while the back end
+    // answers. Returns the bubble element so the reply can replace the dots.
+    function appendChatWaitingBubble() {
+      const thread = document.getElementById('chat-thread');
+      if (!thread) return null;
+      const row = document.createElement('div');
+      row.className = 'flex items-start gap-2.5';
+      const avatar = document.createElement('div');
+      avatar.className = 'w-8 h-8 shrink-0';
+      avatar.innerHTML = CHAT_MARK_SVG;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble-assistant chat-bubble-waiting max-w-[80%] bg-white border border-hairline px-4 py-2.5 rounded-3xl rounded-tl-lg shadow-xs';
+      const typing = document.createElement('span');
+      typing.className = 'kw-chat-typing';
+      typing.setAttribute('role', 'status');
+      typing.setAttribute('aria-label', 'Kosher Chat is typing');
+      const dotDelays = ['0s', '0.15s', '0.3s', '0.45s'];
+      CHAT_DOT_COLORS.forEach((color, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'kw-chat-dot';
+        dot.style.backgroundColor = color;
+        dot.style.animationDelay = dotDelays[i];
+        typing.appendChild(dot);
+      });
+      bubble.appendChild(typing);
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      thread.appendChild(row);
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+      return bubble;
+    }
+
+    function setChatBubbleText(bubble, text) {
+      if (!bubble) return;
+      bubble.textContent = text;
+      const scroller = document.getElementById('chat-messages');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    }
+
+    // Live path: POST { message, history } to the chat back end and swap
+    // the waiting dots for the reply. Any failure (network, HTTP error,
+    // empty reply) lands on one honest message — the conversation itself
+    // is never touched.
+    function requestChatReply(text, history, waitingBubble) {
+      const fail = () => setChatBubbleText(waitingBubble, CHAT_UNREACHABLE);
+      if (typeof fetch !== 'function') { fail(); return; }
+      let ctrl = null;
+      let timer = null;
+      if (typeof AbortController !== 'undefined') {
+        ctrl = new AbortController();
+        timer = setTimeout(() => { try { ctrl.abort(); } catch (e) { /* noop */ } }, 45000);
+      }
+      const done = () => { if (timer) clearTimeout(timer); };
+      fetch(KW_CHAT.replace(/\/+$/, '') + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history }),
+        signal: ctrl ? ctrl.signal : undefined
+      }).then((res) => {
+        if (!res || !res.ok) throw new Error('chat request failed');
+        return res.json();
+      }).then((data) => {
+        done();
+        const reply = data && typeof data.reply === 'string' ? data.reply.trim() : '';
+        if (!reply) throw new Error('chat reply empty');
+        setChatBubbleText(waitingBubble, reply);
+        if (!kwPrivacyVaultOn()) chatHistory.push({ role: 'assistant', text: reply });
+        chatReplyCount++;
+      }).catch(() => { done(); fail(); });
+    }
+
+    function addChatHistoryEntry(text) {
+      const list = document.getElementById('chat-history-list');
+      if (!list) return;
+      const empty = document.getElementById('chat-history-empty');
+      if (empty) empty.remove();
+      const item = document.createElement('div');
+      item.className = 'chat-history-entry px-3 py-2 rounded-xl bg-white/5 text-[13px] text-white/80 truncate';
+      item.textContent = text.length > 30 ? text.slice(0, 30) + '…' : text;
+      list.prepend(item);
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      const hero = document.getElementById('chat-hero');
+      if (hero) hero.classList.add('hidden');
+      if (!chatStarted) {
+        chatStarted = true;
+        if (!kwPrivacyVaultOn()) addChatHistoryEntry(text);
+      }
+      // WhatsApp feel: the visitor's bubble appears instantly, before
+      // any waiting indicator or network round-trip.
+      appendChatBubble(text, 'user');
+      if (!KW_CHAT) {
+        // No back end wired yet — the honest "being connected" reply.
+        setTimeout(() => {
+          appendChatBubble(chatReplyCount === 0 ? CHAT_NOT_CONNECTED_FIRST : CHAT_NOT_CONNECTED_AGAIN, 'assistant');
+          chatReplyCount++;
+        }, 500);
+        return;
+      }
+      const historySnapshot = kwPrivacyVaultOn() ? [] : chatHistory.slice(-10);
+      if (!kwPrivacyVaultOn()) chatHistory.push({ role: 'user', text: text });
+      const waitingBubble = appendChatWaitingBubble();
+      requestChatReply(text, historySnapshot, waitingBubble);
+    }
+
+    function startNewChat() {
+      const thread = document.getElementById('chat-thread');
+      if (thread) thread.innerHTML = '';
+      const hero = document.getElementById('chat-hero');
+      if (hero) hero.classList.remove('hidden');
+      chatStarted = false;
+      chatReplyCount = 0;
+      chatHistory = [];
+      const input = document.getElementById('chat-input');
+      if (input) { input.value = ''; try { input.focus(); } catch (e) { /* focus is cosmetic */ } }
+    }
+
+    function toggleChatParams() {
+      chatParamsOn = !chatParamsOn;
+      const toggle = document.getElementById('chat-params-toggle');
+      const knob = document.getElementById('chat-params-knob');
+      const panel = document.getElementById('chat-params-panel');
+      if (toggle) {
+        toggle.setAttribute('aria-checked', chatParamsOn ? 'true' : 'false');
+        toggle.classList.toggle('bg-brandBlue', chatParamsOn);
+        toggle.classList.toggle('bg-gray-300', !chatParamsOn);
+      }
+      if (knob) knob.style.transform = chatParamsOn ? 'translateX(20px)' : 'translateX(0px)';
+      if (panel) panel.classList.toggle('hidden', !chatParamsOn);
+    }
+
+    function setChatParamScope(scope) {
+      chatParamScope = scope;
+      document.querySelectorAll('.chat-scope-chip').forEach(chip => {
+        const isActive = chip.getAttribute('data-chat-scope') === scope;
+        chip.classList.remove('bg-blue-50', 'text-brandBlue', 'border-blue-200/80', 'bg-surfaceSoft', 'text-inkSecondary', 'border-hairline');
+        if (isActive) {
+          chip.classList.add('bg-blue-50', 'text-brandBlue', 'border-blue-200/80');
+        } else {
+          chip.classList.add('bg-surfaceSoft', 'text-inkSecondary', 'border-hairline');
+        }
+      });
+    }
+
+    // --- Initialization ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCalendar();
+      renderZmanim();
+      renderCardsApp();
+      renderDealsApp();
+      renderDirectoryApp();
+      renderStores();
+      renderAutocomplete('');
+      renderSpecials();
+      startSpecialsAuto();
+      const specialsBox = document.getElementById('home-specials-box');
+      if (specialsBox) {
+        specialsBox.addEventListener('mouseenter', () => { specialsHovering = true; });
+        specialsBox.addEventListener('mouseleave', () => { specialsHovering = false; pauseSpecials(3000); });
+        specialsBox.addEventListener('touchstart', () => { pauseSpecials(); }, { passive: true });
+      }
+      updateSpendCalculator(3500);
+      syncPoints();
+      switchAppView('home');
+      setTimeout(dismissSplash, 2000);
+    });
+  </script>
+
+  <script>
+    /* ==================== APP GRID 18 — FEATURE WIRING ====================
+       Tiles that are live open their real view/feature. Tiles that are not
+       built yet open an honest explainer (FEATURE_INFO) — no fake controls.
+       Privacy Vault and Shabbos Lists are real, working features below. */
+
+    const FEATURE_INFO = {
+      'price-history': {
+        title: 'Price History & Fake-Deal Detector',
+        status: 'Phase 2 — needs price data over time',
+        body: "Every item will carry a 12-month price chart, so you can see whether a Today's Special is a genuine lowest-ever price or an inflated markup. The specials pipeline has started collecting prices — the charts arrive once there is real history to show. Nothing here is drawn from invented data."
+      },
+      'drop-alerts': {
+        title: 'Drop Alerts — Target-Price Alerts',
+        status: 'Phase 1 — building on the specials pipeline',
+        body: "Set a target price for a product and get an instant alert the moment the price drops to it. Drop Alerts ride the same live price pipeline as Today's Specials (Firecrawl + SerpApi) — the alert switch turns on when the live price pulls start."
+      },
+      'promo-coupons': {
+        title: 'Promo Coupons — Auto-Coupon Stacking',
+        status: 'Phase 2 — after the locked checkout',
+        body: 'Verified affiliate promo codes will be tested and applied automatically at checkout, so you always pay the lowest net price without hunting for codes. This needs the locked checkout to exist first — it is a Phase 2 feature.'
+      },
+      'universal-cart': {
+        title: 'Universal Cart',
+        status: 'Phase 2 — after the locked checkout',
+        body: 'One cart for items from Walmart, Amazon, Best Buy and specialty stores, finished in a single locked checkout. The shared cart is planned together with the secure checkout — it is not live yet, and no store is charged through kosher web today.'
+      },
+      'card-maximizer': {
+        title: 'Card Maximizer Badge',
+        status: 'Planned — card types only, never numbers',
+        body: "Tell kosher web which card types you carry — by nickname only, like 'Amex Blue Cash'. kosher web will never ask for or store card numbers. A badge on each product will then show which of your cards earns the most back on that purchase."
+      },
+      'cashback-live': {
+        title: 'Cashback Live',
+        status: 'Phase 2 — needs live affiliate tracking',
+        body: 'Your wallet will show every cash back earning as it moves: Clicked, then Pending, then Confirmed — in real time. That ticker needs live affiliate tracking connected first. Until then, the Rewards wallet shows your balance and claims as it does today.'
+      },
+      'daily-points': {
+        title: 'Daily Points',
+        status: 'Phase 2 — with the points engine',
+        body: 'Earn bonus platform points for daily check-ins and search streaks, feeding your tier (Silver / Gold / Platinum). Points boosts arrive with the full points & cashback engine — the daily streak in the Rewards wallet already works today.'
+      },
+      'image-shield': {
+        title: 'Image Shield — Product-Only Images',
+        status: 'Already guarding Today’s Specials',
+        body: "Every product image pulled into Today's Specials passes the Image Shield first: images that show people are blocked, or replaced with a clean product-only shot, before they can appear. The shield is being extended across the whole site in Phase 1."
+      },
+      'clean-reader': {
+        title: 'Clean Reader',
+        status: 'Planned',
+        body: 'Product reviews and buying guides will open in a clean reading view — the content and verified ratings only, with pop-ups, banners and tracking scripts stripped away.'
+      },
+      'gmail-calendar': {
+        title: 'Gmail & Calendar Glance',
+        status: 'Planned — needs your Google sign-in',
+        body: 'A small pill in the top bar will show your unread email count and upcoming calendar events, and open Gmail or Calendar in one tap. It works through Google sign-in (OAuth) — nothing is connected or read until you sign in yourself.'
+      },
+      'price-match': {
+        title: 'Price-Match Claim',
+        status: 'Planned',
+        body: 'Buy through kosher web and, if the price drops within 7 days, one tap will pre-fill a price-adjustment claim for the retailer or your card. The claim button arrives with the checkout and order tracking.'
+      }
+    };
+
+    function showFeatureInfo(info) {
+      document.getElementById('feature-modal-title').textContent = info.title;
+      document.getElementById('feature-modal-status').textContent = info.status;
+      document.getElementById('feature-modal-body').textContent = info.body;
+      openModal('feature-modal');
+    }
+
+    function openFeatureInfo(key) {
+      const info = FEATURE_INFO[key];
+      if (info) showFeatureInfo(info);
+    }
+
+    // Visual Search lives in Kosher Chat once the Gemini connection is live;
+    // until then the explainer says exactly that (state follows KW_CHAT).
+    function openVisualSearchApp() {
+      switchAppView('chat');
+      if (typeof KW_CHAT !== 'undefined' && KW_CHAT) {
+        showFeatureInfo({
+          title: 'Visual Search',
+          status: 'Available through Kosher Chat',
+          body: 'Photo search is connected: open Kosher Chat and describe or attach the product photo — the assistant finds matching items and the best cash back route. (Snap & Match, the full photo-matching engine, is a Phase 2 build on the same connection.)'
+        });
+      } else {
+        showFeatureInfo({
+          title: 'Visual Search',
+          status: 'Arrives with the Gemini connection',
+          body: 'Snap a photo of any product and kosher web will find it and show the best cash back route. Photo search runs on the Gemini connection — it switches on here as soon as Kosher Chat is connected. Nothing to set up on your side.'
+        });
+      }
+    }
+
+    /* ---------------- Privacy Vault (REAL) ----------------
+       A single on/off flag in localStorage (key kw-privacy-vault) is the
+       ONLY thing the Vault ever stores. While on: the session's stored chat
+       history is purged, chats are not added to the history list, and no
+       conversation history is kept or sent with questions. */
+    const KW_VAULT_KEY = 'kw-privacy-vault';
+
+    function kwPrivacyVaultOn() {
+      try { return localStorage.getItem(KW_VAULT_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    function kwPurgeChatHistory() {
+      if (typeof startNewChat === 'function') startNewChat();
+      const list = document.getElementById('chat-history-list');
+      if (list) {
+        list.innerHTML = '';
+        const note = document.createElement('p');
+        note.id = 'chat-history-empty';
+        note.className = 'px-3 text-xs leading-relaxed text-white/40';
+        note.textContent = 'No chats yet — your conversations will appear here.';
+        list.appendChild(note);
+      }
+    }
+
+    function applyVaultToggleUI() {
+      const on = kwPrivacyVaultOn();
+      const toggle = document.getElementById('vault-toggle');
+      const status = document.getElementById('vault-status-text');
+      if (!toggle || !status) return;
+      /* The switch's track colour and knob position are plain CSS keyed
+         off aria-checked (.kw-vault-switch in the head styles), so setting
+         the attribute + the status text here keeps the visible switch and
+         the words in sync on open and after every flip. */
+      toggle.setAttribute('aria-checked', on ? 'true' : 'false');
+      status.textContent = on
+        ? 'On — nothing is being kept on this device.'
+        : 'Off — chat history is kept on this device.';
+    }
+
+    function togglePrivacyVault() {
+      const on = !kwPrivacyVaultOn();
+      try {
+        if (on) localStorage.setItem(KW_VAULT_KEY, '1');
+        else localStorage.removeItem(KW_VAULT_KEY);
+      } catch (e) {}
+      if (on) kwPurgeChatHistory();
+      applyVaultToggleUI();
+      showToast(on
+        ? 'Privacy Vault on — chat history cleared, and nothing new will be kept.'
+        : 'Privacy Vault off — chat history is kept on this device again.');
+    }
+
+    function openPrivacyVault() {
+      applyVaultToggleUI();
+      openModal('privacy-vault-modal');
+    }
+
+    /* ---------------- Shabbos Lists (REAL) ----------------
+       Pre-built checklists; ticks persist on this device only
+       (localStorage kw-shabbos-lists-v1). No prices — bundle pricing is a
+       later phase, and the panel says so. */
+    const KW_SHABBOS_KEY = 'kw-shabbos-lists-v1';
+    const SHABBOS_LISTS = [
+      { group: 'Paper Goods', items: ['Paper plates', 'Cups', 'Cutlery', 'Napkins', 'Paper towels', 'Tablecloths'] },
+      { group: 'Hosting', items: ['Challah', 'Wine & grape juice', 'Shabbos candles', 'Flowers', 'Soda & drinks', 'Dessert'] },
+      { group: 'Pantry Staples', items: ['Flour', 'Sugar', 'Oil', 'Eggs', 'Coffee & tea', 'Spices'] }
+    ];
+
+    function kwShabbosId(name) {
+      return name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function kwShabbosState() {
+      try {
+        const raw = localStorage.getItem(KW_SHABBOS_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+      } catch (e) { return {}; }
+    }
+
+    function kwShabbosSave(state) {
+      try { localStorage.setItem(KW_SHABBOS_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function renderShabbosLists() {
+      const body = document.getElementById('shabbos-lists-body');
+      if (!body) return;
+      const state = kwShabbosState();
+      body.innerHTML = '';
+      SHABBOS_LISTS.forEach(function (section) {
+        const done = section.items.filter(function (name) { return state[kwShabbosId(name)]; }).length;
+        const wrap = document.createElement('div');
+        wrap.className = 'mt-4 first:mt-0';
+        const head = document.createElement('div');
+        head.className = 'flex items-center justify-between';
+        const h = document.createElement('h4');
+        h.className = 'text-[11px] font-semibold uppercase tracking-wider text-inkSecondary';
+        h.textContent = section.group;
+        const count = document.createElement('span');
+        count.className = 'text-[11px] font-medium text-inkTertiary';
+        count.textContent = done + ' / ' + section.items.length;
+        head.appendChild(h);
+        head.appendChild(count);
+        wrap.appendChild(head);
+        const list = document.createElement('div');
+        list.className = 'mt-2 divide-y divide-gray-100 rounded-2xl border border-gray-100 overflow-hidden';
+        section.items.forEach(function (name) {
+          const id = kwShabbosId(name);
+          const label = document.createElement('label');
+          label.className = 'flex items-center gap-3 px-3.5 py-2.5 bg-white hover:bg-gray-50 cursor-pointer';
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.className = 'w-4.5 h-4.5 accent-[#1A73E8] cursor-pointer shrink-0';
+          input.setAttribute('data-shabbos-item', id);
+          input.checked = !!state[id];
+          input.addEventListener('change', function () { toggleShabbosItem(id, input.checked); });
+          const text = document.createElement('span');
+          text.className = 'text-sm text-inkPrimary' + (state[id] ? ' line-through opacity-50' : '');
+          text.textContent = name;
+          label.appendChild(input);
+          label.appendChild(text);
+          list.appendChild(label);
+        });
+        wrap.appendChild(list);
+        body.appendChild(wrap);
+      });
+    }
+
+    function toggleShabbosItem(id, checked) {
+      const state = kwShabbosState();
+      if (checked) state[id] = true; else delete state[id];
+      kwShabbosSave(state);
+      renderShabbosLists();
+    }
+
+    function clearShabbosLists() {
+      kwShabbosSave({});
+      renderShabbosLists();
+      showToast('Shabbos lists cleared — all ticks removed.');
+    }
+
+    function openShabbosLists() {
+      renderShabbosLists();
+      openModal('shabbos-lists-modal');
+    }
+
+    /* ---------------- Gemini status pill ----------------
+       Rendered only when a Gemini endpoint is actually configured
+       (KW_CHAT non-empty) — never as decoration while unconnected. */
+    function applyGeminiPill() {
+      const row = document.getElementById('gemini-pill-row');
+      if (!row) return;
+      if (typeof KW_CHAT !== 'undefined' && KW_CHAT) row.classList.remove('hidden');
+    }
+    document.addEventListener('DOMContentLoaded', applyGeminiPill);
+  </script>
+
+  <!-- ==================== KOSHER WEB TOOLS / PLUG-INS ====================
+       Same pattern as the owner's other sites: one config object, loaders
+       that NO-OP while a value is empty. Fill values only from the owner's
+       own accounts — never invent a project ID or DSN.
+       - Microsoft Clarity ......... KW_TOOLS.clarityId (empty for now)
+       - Sentry (browser) .......... KW_TOOLS.sentryDsn (empty for now)
+       - UptimeRobot ............... added later from the owner's account (not code)
+       - Cloudflare Turnstile ...... added later; needs the owner's in-person step (not code)
+  -->
+  <script>
+    const KW_TOOLS = {
+      clarityId: "zg92l49p48",
+      sentryDsn: "https://273a19fbf8b55c6a2566dd4398964a7e@o4512460213714944.ingest.us.sentry.io/4512460215615488"
+    };
+
+    // Microsoft Clarity loader — no-op until a project ID is set.
+    (function loadKwClarity() {
+      if (!KW_TOOLS.clarityId) return;
+      (function (c, l, a, r, i, t, y) {
+        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+        t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", KW_TOOLS.clarityId);
+    })();
+
+    // Sentry browser loader — no-op until a DSN is set.
+    (function loadKwSentry() {
+      if (!KW_TOOLS.sentryDsn) return;
+      var s = document.createElement('script');
+      s.src = 'https://browser.sentry-cdn.com/7.120.0/bundle.min.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = function () {
+        if (window.Sentry) window.Sentry.init({ dsn: KW_TOOLS.sentryDsn });
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+
+</body>
+</html>
