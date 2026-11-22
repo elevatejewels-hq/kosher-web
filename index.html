@@ -2729,7 +2729,7 @@
       let timer = null;
       if (typeof AbortController !== 'undefined') {
         ctrl = new AbortController();
-        timer = setTimeout(() => { try { ctrl.abort(); } catch (e) { /* noop */ } }, 30000);
+        timer = setTimeout(() => { try { ctrl.abort(); } catch (e) { /* noop */ } }, 90000);
       }
       const done = () => { if (timer) clearTimeout(timer); };
       fetch(KW_CHAT.replace(/\/+$/, '') + '/chat', {
